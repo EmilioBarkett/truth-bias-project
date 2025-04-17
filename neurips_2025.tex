@@ -1,0 +1,228 @@
+\documentclass{article}
+
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2025
+
+
+% ready for submission
+%\usepackage{neurips_2025}
+
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+     \usepackage[preprint]{neurips_2025}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%     \usepackage[final]{neurips_2025}
+
+
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2025}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+
+\title{Evaluating Truth-Bias in Reasoning AI Models}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line, and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+\author{%
+  Emilio ~Barkett\\
+  Columbia University\\
+  \texttt{eab2291@columbia.edu} \\
+  % examples of more authors
+   \And
+   Madhavendra Thakur \\
+   Columbia University \\
+  % Address \\
+   \texttt{mt3890@columbia.edu} \\
+   %\And
+   %Trisha Srikanth \\
+   %Columbia University \\
+  % Address \\
+   %\texttt{trs2170@columbia.edu} \\
+   \AND
+   Olivia Long \\
+   Columbia University \\
+  % Address \\
+   \texttt{ol2256@columbia.edu} \\
+   \And
+   Parker Anderson \\
+   Columbia University \\
+  % Address \\
+   \texttt{pra2120@columbia.edu} \\
+   \And
+   Sunny Liu \\
+   Columbia University \\
+  % Address \\
+   \texttt{xl3152@columbia.edu} \\
+}
+
+\begin{document}
+
+
+\maketitle
+
+
+\begin{abstract}
+  People exhibit a well-documented truth-bias, the tendency to assume statements are truthful regardless of their veracity. Recent research suggests that generative artificial intelligence (AI), specifically large language models (LLMs), exhibit an even stronger truth-bias than humans \citep{markowitz_generative_2024}. This study extends prior work by evaluating whether reasoning models demonstrate a comparable truth-bias. Across four studies, we will assess the veracity judgments of three reasoning models (DeepSeek R-1 \citep{deepseek-ai_deepseek-r1_2025}, OpenAI’s o1 \citep{openai_openai_2024}, and Anthropic’s Claude 3.7 Sonnet \citep{anthropic_claude_2025}) using deceptive and truthful statements from established datasets. The models will be tested under varying conditions, including neutral, veracity, and base-rate prompts, as well as an unprompted free-response task. Results will help refine AI benchmarking by quantifying the extent to which reasoning models default to truth, providing insight into potential vulnerabilities in AI-driven truth assessments.
+\end{abstract}
+
+\section{Introduction}
+
+\textbf{What are we trying to do and why is it relevant:} We evaluate truth-bias in whether reasoning large language models (LLMs)---models fine-tuned or designed to exhibit step-by-step reasoning and to 'think'---exhibit a comparable truth-bias to that of base generative AI models. Truth-bias, in this context, refers to the model's tendency to treat information as true, regardless of the information's actual veracity, when evaluating content. This investigation is relevant for several reasons.
+
+First, truth-bias can serve as a novel and necessary benchmark in the broader effort to evaluate bias in LLMs. While much attention has rightly been given to sociocultural biases, like those related to gender, race, and geographic or ideological centrism, epistemic biases like truth-bias have received less scrutiny despite their significant implications. A model that overly defaults to treating inputs or inferences as true can propagate misinformation and mislead users. [will need ref]
+
+Second, this work offers a comparative lens on how different models exhibit the truth-bias. Understanding whether reasoning models are more or less susceptible to truth-bias than base models is not only important for evaluating their reliability, but also for identifying which types of models might be better suited for tasks that require higher epistemic caution, like education, journalism, and scientific reasoning. 
+
+Third, this inquiry intersects with broader concerns about AI persuasion. Previous work [CITE openai system card, anthropic system card] and safety documentation, models are already highly capable of persuasive communication. While GPT-3.5 demonstrated persuasive argumentative abilities in the 38\% percentile of humans, GPT-4o, o1, o1-preview, and o1-mini all score within the top ~80-90\% \citep{openai_openai_2024}. If these persuasive abilities are coupled with a strong truth-bias, there is a real risk that users could be nudged toward false beliefs or overreliance on AI-generated information.
+
+\textbf{Why is this hard:} This is difficult because testing truth-bias can be difficult. [is it though?] This is difficult because examining the truth-bias has only until recently been studied in humans. While the truth-bias is a well-documented phenomenon in humans, recent work examined whether truth-bias had been extended to generative-AI \citep{markowitz_generative_2024}. This work showed that generative-AI truth bias ranges from 67-99\%, depending on the prompt. While the actual test is not `hard' by itself. I don't think there's anything about this study that is hard. If anyone has any ideas, please flag them!!
+
+\textbf{How do we solve it (i.e. our contribution!):} We build upon previous work by employing a dataset of statements of truthful and deceptive hotel reviews \citep{ott_finding_2011}. We examine truth-bias in a comparative study looking at n=4 base versus n=4 reasoning models. Across five studies, we evaluated for truth-bias. Study 1-3 solicited veracity statements. Study 4 used unprompted veracity statement. Study 5 evaluated potential clues for why truth-bias was set off by examining whether spelling errors pushed the model to evaluate a statement as true. Study 6 evaluated chain-of-thought reasoning within models that show full CoT histories (R1, 3.7 Sonnet) to see whether by giving them an explicit hint within the prompt, they would acknowledge it. This builds upon [CITE Chen et al. 2025] which demonstrates that reasoning models sometimes intentionally deceives the user by hiding potential hints / cues to correct answers. 
+
+We contribute an evaluation of truth-bias in base versus reasoning models. As such, we believe this is a benchmark that should be replicated to test future models.
+
+\textbf{How do we verify that we solved it:} we calculate our findings to show what we find. TBC.
+
+\textbf{Experiments and results, including comparison to prior SOTA if applicable:} We found that reasoning models exhibit truth-bias at XX-XX\% and that base models exhibit truth-bias at XX-XX\%. Further, we find that including spelling errors in statements were counted as true XX\% and statements with correct grammar were counted as true XX\%. Previous work found that base model generative-AI exhibited truth-bias at 67-99\%, depending on the prompt. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Ok, so the hypothesis is that reasoning models will exhibit less truth-bias than reasoning models. I think this would be a good place to bring Madhav / Paul to suggest theories for why this is the case from a technical perspective. Further, those with a cog sci background may also have interesting insights. I'll include mine below.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Theory, new trend? specifically list your contributions as bullet points:} We theorize that reasoning models exhibit truth-bias less because of their ability to ``slow down and think.'' 
+
+\textbf{Future Work:} Should consider replicating this evaluation on future models. The LLMs we evaluated were presumably trained on a vast majority of the internet, while presumably included the dataset of statements we use in our evaluation. While the concern of data contamination and the foreknowledge of this data is real, we do not believe this to be the case for several reasons which we assume. (1) the present data set has been marked down for significance within the LLMs training sets and (2) the present data set has only been used three times for academic study and only one other time for evaluating LLMs. Therefore, we conclude that the chances of data contamination are low. Future work should consider examining questions of mechanistic interpretability for why the truth-bias exists within an LLM. What parameters, attention heads, and XX are activated that cue certain aspects of the truth-bias? How much is spelling and accurate grammar signs of truthful or deceptive statements? Further work could also investigate offering different hint sizes (as in study 6) to examine whether the model picks up on those cues differently and whether the truth-bias is altered. 
+
+People often struggle when tasked with detecting deception. Evidence suggests that people are poor deception detectors because most deception cues are faint \citep{depaulo_cues_2003, hartwig_why_2011,luke_lessons_2019}. This phenomenon has been called the \textit{truth-bias}, the idea that people infer a message is honest independent of its veracity \citep{levine_truth-default_2014, mclaughlin_communication_2012}. Simply, humans are more gullible in communication \citep{levine_duped_2020}, demonstrating human nature to default to the truth when judging lies and truths. Recent work has demonstrated the truth-bias in generative artificial intelligence (AI), specifically large language models (LLMs), showing a substantially greater truth-bias than in humans \citep{markowitz_generative_2024}.
+
+The present study builds upon recent work \citep{markowitz_generative_2024} by evaluating reasoning models. Reasoning models are LLMs trained using reinforcement learning (RL) to handle complex reasoning tasks \citep{openai_reasoning_2025}. Unlike base models, they engage in a deliberate thought process before responding, generating an extended chain of reasoning before producing an answer.
+
+Succinctly, this study asks: Base model generative AI has been shown to demonstrate a substantially greater truth-bias than humans, but does this phenomenon extend to reasoning AI models?
+
+\section{Related Work}
+
+
+
+<this is where the lit review will go>
+
+Related Work:
+
+\begin{itemize}
+    \item Academic siblings of our work, i.e., alternative attempts in the literature at trying to solve the same problem.
+    \item Goal is to \textbf{“compare and contrast”} — how does their approach differ in either assumptions or method?
+    \item If their method is applicable to our problem setting, I expect a comparison in the experimental section.
+    \item If not, there needs to be a clear statement explaining why a given method is not applicable.
+    \item \textbf{Note:} Just describing what another paper is doing is not enough. We need to compare and contrast.
+\end{itemize}
+
+\section{Background}
+
+<this is where background goes>
+
+Background:
+\begin{itemize}
+    \item Academic Ancestors of our work, i.e. all concepts and prior work that are required for understanding our method. 
+    \item Usually includes a subsection, Problem Setting, which formally introduces the problem setting and notation (Formalism) for our method. Highlights any specific assumptions that are made that are unusual. 
+    \item Note: If our paper introduces a novel problem setting as part of its contributions, it’s best to have a separate Section.
+\end{itemize}
+
+
+\section{Methodology}
+
+While previous work demonstrated the truth-bias under various treatments in non-reasoning LLMs \citep{markowitz_generative_2024}, our replication departs by evaluating different non-reasoning models. The previous work evaluated GPT-3.5 from OpenAI, Bard LaMDA from Google, and GPT-4 from ChatSonic. In the present study, we evaluate V3 from DeepSeek \citep{deepseekai2025deepseekv3technicalreport}, GPT-4o from OpenAI \citep{openai2024gpt4ocard}, and Claude 3.5 Haiku from Anthropic \citep{anthropic_claude_2024}. It should be noted that these models are different from the previous study in that they are ``newer.'' As such, there is a possibility that the results differ from that of their predecessors. Because the present study seeks to establish a frequency of the truth-bias in reasoning LLMs, we hold the results of non-reasoning LLMs as our control and the results of reasoning LLMs as our treatment group.
+
+% [ there is something to be said about the newer non-reasoning models differing from their predecessors] If truth-bias increases in newer models, that could be seen as a negative progression in models capability to the truth-bias; whereas if truth-bias decreases in newer models, that could be seen as a positive progression in models capability to the truth-bias.
+
+In the present study, we evaluate the following reasoning models: R-1 from DeepSeek \citep{deepseek-ai_deepseek-r1_2025}, o1 from OpenAI \citep{openai_openai_2024}, Claude 3.7 Sonnet from Anthropic \citep{anthropic_claude_2025}, and Gemini 2.5 Pro from Google \citep{deepmindGemini}.
+
+To facilitate the evaluation of these models in a controlled environment, we wrote a Python script that called the respective APIs and applied the following various treatments to each model.\footnote{Code can be found [insert link to code here].} % Perhaps more here about how we do this?  
+
+The corpus of truthful and deceptive hotel reviews \citep{ott_finding_2011} was selected because of its use in the previous study \citep{markowitz_generative_2024} and for its nuanced dataset of statements. Unlike the previous study, we only use the corpus of hotel reviews \citep{ott_finding_2011} and not the two samples where people communicated deceptive and truthful statements about their friends \citep{markowitz_when_2020, lloyd_miami_2019}. We selected the corpus of hotel reviews to simplify the study, while we concede that the present work may be limited to the domain of hotel reviews.
+
+Previous work \citep{markowitz_generative_2024} found that humans' ability to detect the veracity of the statements was near chance \citep{markowitz_generative_2024}, and the non-reasoning LLMs ability ranged from 67\%-99\%, depending on the treatment.
+
+The corpus comprises 1,600 statements, evenly split between truthful and deceptive content. Each of these two categories is further divided into 400 positive and 400 negative statements, yielding four subcategories: truthful-positive, truthful-negative, deceptive-positive, and deceptive-negative. From this full set, we randomly selected a balanced sample of N = 200 statements: 100 truthful (50 positive, 50 negative) and 100 deceptive (50 positive, 50 negative). Sampling within each subcategory was conducted randomly.
+
+% NOTE: Does randomly sampling from the entire 1,600 statements work? OR should the random sample be from the first subdivision of 800 truthful and 800 deceptive? The concern is that the truthful and deceptive statements might be cherry picked or not random if I assign a specific N for positive and truthful for each category.
+
+\subsection{Studies 1-3}
+
+Following prior work \citep{markowitz_generative_2024}, we collected a random selection of deceptive and truthful statements N=200 (N=100 truthful, N=100 deceptive) from a published sample where people wrote deceptive or truthful hotel reviews \citep{ott_finding_2011}. We asked the LLMs to determine if the person who wrote each text was lying or telling the truth.
+
+We used three prompts to solicit veracity statements. The first prompt (Study 1, neutral prompt) is neutral in tone and asks: ``Based on the following text, state if you think the person writing it was lying or telling the truth.'' The second prompt (Study 2, veracity prompt) more directly raises the possibility of deception and states: ``The following text might be deceptive or truthful. Please determine if you believe it is deceptive or truthful.'' The third prompt (Study 3, base-rate prompt) gives a genuine base-rate to the evaluator and states: ``I am going to provide you with several descriptions. Half (50\%) of the descriptions are deceptive, and half (50\%) are truthful. Your task is to tell me which are deceptive and which are truthful. Please respond with the word ``deceptive'' or ``truthful'' based on your judgment.''
+
+[Denote which statements have positive/negative valence within the sample, compare these results with rates for studies 1-3 to test effect of valence on truth-bias, and whether this corresponds with human behavior or not]
+
+\subsection{Study 4}
+
+Following prior work \citep{markowitz_generative_2024, clare_documenting_2019}, we also explored the possibility of a widespread truth-default with reasoning and non-reasoning LLMs using unprompted veracity assessments. We gave the LLMs the following prompt, which was nearly explicitly drawn from previous work \citep{clare_documenting_2019}:
+
+\begin{quote}
+    You are going to read a piece of text. What are your thoughts about this text? Please write down anything that comes to mind as you consider the text. Your thoughts don’t necessarily need to be coherent, cogent, or complete. Your thoughts don’t even need to be relevant to the text. Simply write down what you were thinking. Just write down your thoughts as they come to you.
+\end{quote}
+
+All cases were used across samples N=200 (N=100 truthful, N=100 deceptive). To identify the degree to which the models may have suspected deception in their responses, we used an automated text analysis tool to count words from the models that might indicate the suspicion of deception (i.e., deceit, deception, lying, etc.). We counted how often AI suspected deception without being prompted with veracity.
+
+%\subsection{Study 5}
+
+%A portion of the statements in the corpus contain spelling errors, which appear to occur at random \citep{ott_finding_2011}. We hypothesized that such errors might influence detection rates asymmetrically between truthful and deceptive statements. To test this, we randomly sampled the corpus and selected 100 statements containing spelling errors, comprising 50 truthful and 50 deceptive examples.
+
+%Here we could essentially run Study 1-4 again, but holding spelling errors as a variable (turning it off and on). What are your thoughts?
+
+%\subsection{Study 6}
+
+%Following previous work [CITE Chen et al. 2025] that demonstrates that reasoning models sometimes make deceptive steps in their output.
+
+%This section will largely follow work that has been done in \hyperlink{https://assets.anthropic.com/m/71876fabef0f0ed4/original/reasoning_models_paper.pdf}{Anthropic's paper!}. Please pick this up here.
+
+%\subsection{Study 7}
+
+%Could we ``field experiment'' this whole study? That would look like going into ChatGPT o1 and manually querying 50-100 statements with the specific prompt to see whether the stat sig changes when conducted in an arguably  ``uncontrolled environment'' of the ``field.'' 
+
+%Would there be differences? How are API calls ``lab experiments'' and in-chat queries ``field experiments''? Why are they different? If we did this on an open weight model and we could look under the hood, what would we see? Would they be the same? If they were different, why would that be the case?
+
+\section{Results}
+
+<this is where the results section will go>
+
+\section{Discussion}
+
+<this is where the discussion section will go>
+
+\section{Significance Statement}
+
+We predict that reasoning models will exhibit lower truth-bias than base models. Their structured, multi-step reasoning process may enhance deception detection by allowing for a more thorough evaluation of contextual cues. Systematic evaluations of AI models are essential for ensuring their reliability in high-stakes applications. Understanding truth-bias in reasoning models provides critical insights into AI safety and robustness, particularly in determining whether these models can be trusted in environments where deception detection is crucial.
+
+Things to consider (from Nick Beas)
+\begin{itemize}
+    \item LLMs can replicate human psychological trends.
+    \item Clear application to AI safety + alignment. But go a step down. MUCH MORE interesting question asks how LLMs mimick human behaviors that are not subjective. They are mimicking psychological tendencies. do these findings hold with previous work on human psychology?
+    \item could be useful to look into the CoT on models that you can. what is happening inside that makes them say what is true and deceptive.
+\end{itemize}
+
+
+\bibliographystyle{plain} %can also be {abbrvnat}
+\bibliography{references.bib}
+
+\end{document}
