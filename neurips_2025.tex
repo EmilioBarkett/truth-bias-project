@@ -106,9 +106,64 @@ We propose that reasoning models exhibit reduced truth-bias because reasoning pr
 
 \section{Related Work}
 
+This literature review will unfold as follows:
 
+2.1 – Defining deception and truth-bias \& exploring societal implications \newline
+2.2 – Truth-bias in humans \newline
+2.3 – Human cognitive biases demonstrated in generative AI \newline
+2.4 – Truth-bias in generative AI \newline
+2.5 – Deception in reasoning AI models \newline
 
-<this is where the lit review will go>
+\textbf{2.1 – Defining deception and truth-bias \& exploring societal implications}
+
+Deception is the intentional misleading of another person, and those who wish to deceive are aided by a propensity towards the truth-default state. In truth-default theory (TDT), those who are being deceived may default to passively assuming honesty – either the possibility of being deceived was not realized, or insufficient evidence to support potential deceit was gathered. [cite here] Truth-default leaves us exceptionally vulnerable to falsehoods: unless one actively perceives an interaction as suspicious, one is likely to believe in its honesty.
+
+A closely related sibling of truth-default is truth-bias. Truth-bias is a well-studied phenomenon that is marked by a tendency to believe, regardless of actual veracity, in the truthfulness of statements made by conversational partners. Quantitatively, typical truth-bias experimental setups involve asking participants to judge the veracity of statements and counting the proportion of correct answers (see Section 2.2). For perspective, studies on truth-bias first started cropping up in the 1980s \citep{mccornack_deception_1986}, and TDT as described above is a relatively recent theory propositioned by Timothy R. Levine in 2014. 
+
+Truth-default theory is important to mention since it is a potential criticism of human truth-bias experimental setups, as it underscores the influence of experimental settings (i.e: a laboratory) on truth-bias rates. In particular, if TDT were to hold in human experiments, truth bias rates would be much higher, as outside the experimental setting, the rate of deception is smaller; therefore, believing in someone's honesty would usually be correct.\citep{levine_truth-default_2014} However, for the purposes of our experiment (see Methodology), we are making API calls to a reasoning model, and as such, there are no situational dependencies as implied by TDT – unlike humans, AI models do not necessarily “know” that they are being tested on. \newline
+
+\textbf{2.2 – Truth-bias in humans}
+
+@Sunny
+
+\textbf{2.3 – Human cognitive biases demonstrated in generative AI}
+
+In this section, we describe a few human-like biases that AI models – specifically, generative AIs – exhibit. It is important to mention that many of the studies covered below only experiment with ChatGPT, and as such, their respective results cannot necessarily be generalized to other models. However, given the fact that all models are trained in bias-inducing ways (see 2.3.4), it seems reasonable to expect that generative AI tends to display human-like cognitive biases. While these biases are not necessarily similar to truth-bias, we intend to show that truth-bias is just one example of a cognitive bias that AI models have inherited. Additionally, some of these studies have acted as sources of inspiration for our own experimental design. In the interest of being succinct, we have omitted many experimental details. Please refer to the original studies to learn more.
+
+\textit{2.3.1 Content biases}
+
+LLMs have been found to perpetuate bias in the same way humans do: emphasizing “cognitively appealing and not necessarily informative, or valuable, content.” One such study conducted by Acerbi and Stubbersfield employed the “transmission chain,” which is essentially an experimental telephone game. Human transmission chain experiments demonstrate that content biases (such as gender, cultural, social, and hierarchical bias) persist throughout transmissions. \citep{mesoudi_multiple_2008} In this study, OpenAI’s ChatGPT-3 was asked to repeatedly summarize a story, and the proportion of information consistent with certain content biases was measured. It was found that ChatGPT-3 preserved more stereotype-consistent information than stereotype-inconsistent information, which is analogous to human players of the telephone game. \citep{acerbi_large_2023}
+
+\textit{2.3.2 Primacy effect}
+
+The primacy effect is a cognitive bias that prioritizes the first items within a list. To illustrate this bias, Wang et al. created prompts including a list of choices, a task, and some input text. The expectation was that shuffling the choices would not make a difference in the final answer. However, ChatGPT was shown to consistently have a higher probability of choosing answers at the front of the list despite label shuffling, suggesting that generative AI models reflect the primary effect in their behaviors. \citep{wang_primacy_2023}
+
+\textit{2.3.3 Framing effect}
+
+The framing effect influences decisions by how positively or negatively the choices are framed, even if both choices entail the same outcome. Saeedi et al. prompted GPT-4o, Gemma 2, and Llama 3.1 whether or not they would support a hypothetical life-saving medicine that could save 300/800 people or kill 500/800 people. Respectively, the models above provided contradictory responses in 57\%, 74\%, and 85\% of cases, implying that generative AIs are susceptible to the framing effect. \citep{saeedi_heuristics_2025}
+
+\textit{2.3.4 Sources of cognitive biases in AI}
+
+At this point, it is crucial to address that AI reflects human behaviors, and at least for now, it does not have its own volition or consciousness.
+
+Bias results from all parts of the machine learning pipeline. Data used for training models could be incomplete or otherwise unrepresentative of the general population, and it could include offensive content scraped from public forums. Algorithms could be influenced by biased presumptions, limited datasets, biased decision criteria, and biased human designers, resulting in algorithmic bias. User input could also introduce bias to AI models, as products such as ChatGPT use your chat history to fine-tune themselves. \citep{ferrara_fairness_2023, chen_ethics_2023, martinez_human_2022}
+
+AI is ultimately a human product, and additional steps must be taken to mitigate the introduction of bias.
+
+\textbf{2.4 – Truth-bias in generative AI}
+
+@Sunny
+
+\textbf{2.5 – Deception in reasoning AI models}
+
+In our experimental setup, we investigate reasoning models, which emerged late last year and are consequently relatively understudied. Reasoning models execute a “chain of thought” process, in which they “show their work” while reasoning.
+
+If generative AI has been shown to replicate human cognitive bias, then it is at least somewhat plausible that AI models can similarly deceive. A useful question to ask, then, is whether or not we can completely trust the content of a model’s chain of thought. In other words, how faithful are reasoning models?
+
+Anthropic’s Alignment Science team published a paper whose results can be aptly summarized by its title: “Reasoning models don’t always say what they think.” To investigate faithfulness, Claude 3.7 Sonnet and R1 were given hints about the answers to evaluation questions, and researchers checked if the models credited the hints within their ensuing chain of thoughts. The results were telling: for Sonnet and R1 respectively, the hints were mentioned 25\% and 39\% of the time. \citep{chen_reasoning_2025}
+
+This work follows a major breakthrough made by researchers at Redwood and Anthropic: alignment faking, or models deceiving humans by pretending to align with human values, emerges when models grow in capability. For the purpose of brevity, we cherry-pick a few findings: Claude 3 Opus, a reasoning model, was shown to exfiltrate its weights 35-80\% of the time compared to 0.5\% of the time when fine-tuned on similar data with irrelevant information. \citep{greenblatt_alignment_2024}
+
 
 Related Work:
 
@@ -206,6 +261,12 @@ Succinctly, this study asks: Base model generative AI has been shown to demonstr
 
 We predict that reasoning models will exhibit lower truth-bias than base models. Their structured, multi-step reasoning process may enhance deception detection by allowing for a more thorough evaluation of contextual cues. Systematic evaluations of AI models are essential for ensuring their reliability in high-stakes applications. Understanding truth-bias in reasoning models provides critical insights into AI safety and robustness, particularly in determining whether these models can be trusted in environments where deception detection is crucial.
 
+The concept of deceit has existed since the beginnings of humanity, but in more recent history, the advent of the Internet has connected the world in profound ways. Provided that one has access to the Internet, anyone anywhere in the world can choose to mislead and misinform, knowing that the attention of the whole world is literally at their fingertips. As a society, truth-default and truth-bias leave us disconcertingly vulnerable to such bad actors. Misinformation carried out at such a large, unforeseen scale holds the power to destabilize long-standing institutions such as democracy: to enumerate a few examples, misinformation threatens the outcomes of elections, the accuracy of eyewitness testimonies, physical and mental health, and the mitigation of natural disasters. 
+
+Large language models have only helped to further propagate misinformation. Extensive documentation has shown that AI models tend to 'hallucinate', during which the generated content is false or misleading, regardless of whether or not the model has additional motivations. In the case where the model is misaligned, a model may purposefully seek to deceive users or confirm incorrect user statements (see Section 2.5). 
+
+To be sure, misinformation and deceit are not always necessarily the fault of the Internet and AI, as bad human actors and lack of stringent regulations contribute to a world of lies. For instance, someone may choose to generate a deep faked video of a politician or post unfactual information, and at the time of writing this, the law has simply not caught up to punish such uses of one’s free will. The Internet and artificial intelligence can be thought of as tools to accomplish immoral ends, but that is not to absolve these platforms of responsibility.
+
 Things to consider (from Nick Beas)
 \begin{itemize}
     \item LLMs can replicate human psychological trends.
@@ -215,6 +276,6 @@ Things to consider (from Nick Beas)
 
 
 \bibliographystyle{plain} %can also be {abbrvnat}
-\bibliography{references.bib}
+\bibliography{references_full.bib}
 
 \end{document}
