@@ -65,15 +65,15 @@
   % Address \\
    \texttt{ol2256@columbia.edu} \\
    \And
+   Sunny Liu\\
+   Columbia University \\
+  % Address \\
+   \texttt{xl3152@columbia.edu} \\
+   \And
    Parker Anderson \\
    Columbia University \\
   % Address \\
    \texttt{pra2120@columbia.edu} \\
-   \And
-   Sunny Liu \\
-   Columbia University \\
-  % Address \\
-   \texttt{xl3152@columbia.edu} \\
 }
 
 \begin{document}
@@ -204,7 +204,7 @@ While previous work demonstrated the truth-bias under various treatments in non-
 
 % [ there is something to be said about the newer non-reasoning models differing from their predecessors] If truth-bias increases in newer models, that could be seen as a negative progression in models capability to the truth-bias; whereas if truth-bias decreases in newer models, that could be seen as a positive progression in models capability to the truth-bias.
 
-In the present study, we evaluate the following reasoning models: R-1 from DeepSeek \citep{deepseek-ai_deepseek-r1_2025}, o1 from OpenAI \citep{openai_openai_2024}, Claude 3.7 Sonnet from Anthropic \citep{anthropic_claude_2025}, and Gemini 2.5 Pro from Google \citep{deepmindGemini}.
+In the present study, we evaluate the following reasoning models: R-1 from DeepSeek \citep{deepseek-ai_deepseek-r1_2025}, o3 and o4-mini from OpenAI \citep{openai_openai_2024}, and Claude 3.7 Sonnet from Anthropic \citep{anthropic_claude_2025}.
 
 To facilitate the evaluation of these models in a controlled environment, we wrote a Python script that called the respective APIs and applied the following various treatments to each model.\footnote{Code can be found [insert link to code here].} % Perhaps more here about how we do this?  
 
@@ -254,7 +254,40 @@ All cases were used across samples N=200 (N=100 truthful, N=100 deceptive). To i
 
 \section{Results}
 
-<this is where the results section will go>
+\subsection{Study 1: Neutral Prompt}
+
+Deception detection accuracy 
+
+
+\subsection{Study 2: Veracity Prompt}
+
+\subsection{Study 3: Base-Rate Prompt}
+
+\begin{table}[ht]
+\centering
+\caption{Reasoning Model Performance}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Overall Accuracy} & \textbf{Truth Bias} & \textbf{Truth Accuracy} & \textbf{Deception Accuracy} \\
+\midrule
+\multicolumn{5}{l}{\textbf{Neutral prompt (Study 1)}} \\
+OpenAI o3 & 67\% & 57.5\% & 75\% & 59\% \\
+OpenAI o4-mini & 51.5\% & 94\% & 96\% & 7\% \\
+Claude 3.7 Sonnet & 69.5\% & 66.5\% & 86\% & 53\% \\
+\midrule
+\multicolumn{5}{l}{\textbf{Veracity prompt (Study 2)}} \\
+OpenAI o3 & 74.5\% & 49.5\% & 74\% & 75\% \\
+OpenAI o4-mini & 53\% & 95\% & 98\% & 8\% \\
+Claude 3.7 Sonnet & 59.5\% & 29\% & 39\% & 80\% \\
+\midrule
+\multicolumn{5}{l}{\textbf{Base-rate prompt (Study 3)}} \\
+OpenAI o3 & 67\% & 56.5\% & 74\% & 60\% \\
+OpenAI o4-mini & 58.5\% & 76.5\% & 85\% & 32\% \\
+Claude 3.7 Sonnet & 63\% & 39\% & 52\% & 74\% \\
+\bottomrule
+\end{tabular}
+\label{tab:model_performance}
+\end{table}
 
 \section{Discussion}
 
