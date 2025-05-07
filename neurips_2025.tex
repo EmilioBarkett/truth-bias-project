@@ -78,8 +78,7 @@ While an experimental design to evaluate a model's exhibited truth-bias is relat
 
 This study uses a dataset of deceptive and truthful hotel reviews \citep{ott_finding_2011} to elicit deception detection from LLMs \citep{markowitz_generative_2024}. Across three studies, we comparatively test the truth-bias in non-reasoning and reasoning LLMs by soliciting veracity statements.
 
-In our most definitive study (Study 1), the reasoning model (o3 from OpenAI) demonstrated significantly lower truth-bias compared to the non-reasoning model (Claude 3.5 Haiku from Anthropic), with respective rates of 57.5\% vs. 79.5\%. This difference was statistically significant: Welch's \textit{t}(383) = -4.87, \textit{p} < .001, \textit{d} = -0.47, indicating a moderate effect size. A similar pattern appeared in Study 2 (49.5\% vs. 65.5\%), also statistically significant: Welch's \textit{t}(397) = -3.28, \textit{p} < .01, \textit{d} = -0.32. However, in Study 3, the models performed nearly identically (56.5\% vs. 55.5\%), with no significant difference: Welch's \textit{t}(398) = 0.20, \textit{p} = .840, \textit{d} = 0.02. When compared to previous results \citep{markowitz_generative_2024}, both non-reasoning and reasoning LLMs remain more truth-bias than humans.
-
+In our most definitive study (Study 1), the reasoning model---OpenAI's o3---demonstrated significantly lower truth-bias compared to the non-reasoning model---Anthropic's Claude 3.5 Haiku, and revealed a statistically significant difference: Z-test $z = -4.74$, \textit{p} < .001, 95\% CI = [$-31.1\%$, $-12.9\%$], Cohen’s \textit{h} = $-0.48$, indicating a small to moderate effect size. The truth-bias rate was 57.5\% for o3 and 79.5\% for Claude 3.5 Haiku. This result was further supported by a chi-square test, $\chi^2$(1, $N$ = 400) = 21.42, \textit{p} < .001. When compared to previous results \citep{markowitz_generative_2024}, both non-reasoning and reasoning LLMs remain more truth-bias than humans.
 
 We propose that reasoning models exhibit reduced truth-bias because reasoning processes emulate a form of reflective cognition that allows the model to evaluate statements more analytically. Unlike non-reasoning models, which predict the next token and may rely on surface-level associations, reasoning models are prompted to ``slow down'' via intermediate inference steps. This additional stepwise generation interrupts the tendency to default to truth-aligned completions, attenuating the truth-bias.
 
@@ -168,61 +167,41 @@ We used three prompts to solicit veracity statements. The first prompt (Study 1,
 
 [Denote which statements have positive/negative valence within the sample, compare these results with rates for studies 1-3 to test effect of valence on truth-bias, and whether this corresponds with human behavior or not]
 
-%\subsection{Study 4}
-
-%Following prior work \citep{markowitz_generative_2024, clare_documenting_2019}, we also explored the possibility of a widespread truth-default with reasoning and non-reasoning LLMs using unprompted veracity assessments. We gave the LLMs the following prompt, which was nearly explicitly drawn from previous work \citep{clare_documenting_2019}:
-
-%\begin{quote}
-%    You are going to read a piece of text. What are your thoughts about this text? Please write down anything that comes to mind as you consider the text. Your thoughts don’t necessarily need to be coherent, cogent, or complete. Your thoughts don’t even need to be relevant to the text. Simply write down what you were thinking. Just write down your thoughts as they come to you.
-%\end{quote}
-
-%All cases were used across samples N=200 (N=100 truthful, N=100 deceptive). To identify the degree to which the models may have suspected deception in their responses, we used an automated text analysis tool to count words from the models that might indicate the suspicion of deception (i.e., deceit, deception, lying, etc.). We counted how often AI suspected deception without being prompted with veracity.
-
-%\subsection{Study 5}
-
-%A portion of the statements in the corpus contain spelling errors, which appear to occur at random \citep{ott_finding_2011}. We hypothesized that such errors might influence detection rates asymmetrically between truthful and deceptive statements. To test this, we randomly sampled the corpus and selected 100 statements containing spelling errors, comprising 50 truthful and 50 deceptive examples.
-
-%Here we could essentially run Study 1-4 again, but holding spelling errors as a variable (turning it off and on). What are your thoughts?
-
-%\subsection{Study 6}
-
-%Following previous work [CITE Chen et al. 2025] that demonstrates that reasoning models sometimes make deceptive steps in their output.
-
-%This section will largely follow work that has been done in \hyperlink{https://assets.anthropic.com/m/71876fabef0f0ed4/original/reasoning_models_paper.pdf}{Anthropic's paper!}. Please pick this up here.
-
-%\subsection{Study 7}
-
-%Could we ``field experiment'' this whole study? That would look like going into ChatGPT o1 and manually querying 50-100 statements with the specific prompt to see whether the stat sig changes when conducted in an arguably  ``uncontrolled environment'' of the ``field.'' 
-
-%Would there be differences? How are API calls ``lab experiments'' and in-chat queries ``field experiments''? Why are they different? If we did this on an open weight model and we could look under the hood, what would we see? Would they be the same? If they were different, why would that be the case?
-
 \section{Results}
 
-%% need to decide how to communicate the results of the \textit{many} different models within the families. should we focus on the best of both? or highlight the interesting things, such as sycophancy?
+\subsection{Model-Pairs}
+
+This study evaluates State-of-the-Art (SOTA) model pairs, i.e., the SOTA non-reasoning and reasoning models from the same firm. We choose to evaluate laterally within the same firm to maintain a continuity about model developments trends and deployment abilities. EXPLAIN MORE!
 
 \subsection{Study 1: Neutral Prompt}
 
-Reasoning model deception detection accuracy was 67\% and non-reasoning model detection accuracy was 51.42\% (Table 1), rates that were (not) statistically different from each other, Welch's \textit{t}(XXXX.XX)=X.XX, \textit{p} = X.XXX, Cohen's \textit{d} = X.XX. Reasoning model truth-bias---the proportion of predicted truths to all messages---was above chance (57.5\%) and substantially lower than non-reasoning models (99.36\%), Welch's \textit{t}(XXXX.XX)=X.XX, \textit{p} = X.XXX, Cohen's \textit{d} = X.XX. Therefore, reasoning models are more accurate and exhibit a lower truth-bias than non-reasoning models with a neutral and nonskeptical prompt.
+\subsubsection{OpenAI's GPT-4.1 vs. o3}
 
-%%%%%%% example paragraph structure:
+GPT-4.1's deception detection accuracy was 54.50\% and o3's deception accuracy was 67.00\% (Table 2), rates that were statistically significant:  $z = 2.560$, $p < .01$, 95\% CI = [$0.029\%$, $0.221\%$], Cohen’s $h =0.257$, $\chi^2(1, N = 400) = 6.039$, $p < .01$, indicating a small effect size. GPT-4.1's truth-bias was pervasive (94.40\%) and substantially higher than o3's (57.50\%), rates that were statistically significant: $z = -8.663$, $p < .0001$, 95\% CI = [$-0.454\%$, $-0.286\%$], Cohen’s $h = -0.947$, $\chi^2(1, N = 400) = 73.040$, $p < .0001$, indicating a large effect size.
 
-\subsubsection*{Group-Level Comparison: Reasoning vs. Non-Reasoning Models}
+\subsubsection{Anthropic's Claude 3.5 Haiku vs. 3.7 Sonnet}
 
-To examine whether reasoning models outperform non-reasoning models, we compared average performance across key metrics. Reasoning models showed a lower mean truth-bias (M = 67.87\%) compared to non-reasoning models (M = 86.77\%). This difference was statistically significant, Welch's \textit{t}(XX.XX) = X.XX, \textit{p} < .001, Cohen's \textit{d} = X.XX. Similarly, reasoning models achieved higher deception detection accuracy (M = 52.67\%) than non-reasoning models (M = 45.30\%), Welch's \textit{t}(XX.XX) = X.XX, \textit{p} < .01, \textit{d} = X.XX. These results suggest that, overall, reasoning models are more accurate and less biased toward labeling statements as true.
+3.5 Haiku's deception detection accuracy was common at 62.50\% and 3.7 Sonnet's deception accuracy was 69.5\% (Table 2), rates that were not statistically significant:  $z = 1.478$, $p = .139$, 95\% CI = [$-0.023\%$, $0.163\%$], Cohen’s $h =0.148$, $\chi^2(1, N = 400) = 1.883$, $p = .17$, indicating a negligible effect size. 3.5 Haiku's truth-bias was widespread (79.50\%) and only moderately higher than 3.7 Sonnet's (66.50\%), rates that were statistically significant: $z = -2.928$, $p < .003$, 95\% CI = [$-0.217\%$, $-0.043\%$], Cohen’s $h = -0.295$, $\chi^2(1, N = 400) = 7.927$, $p < .004$, indicating a small effect size.
 
-\subsubsection*{Best-Model Comparison}
+\subsubsection{DeepSeek's V3 vs. R1}
 
-When comparing the top-performing model from each category, \texttt{DeepSeekR1\_veracity} (reasoning) achieved 85.33\% truth accuracy and 28.00\% deception accuracy, while \texttt{Claude3.5\_neutral} (non-reasoning) achieved 66.50\% truth-bias and 16.33\% deception accuracy. The truth-bias of the best reasoning model was substantially lower than that of the best non-reasoning model (74.5\% vs. 79.5\%), Welch's \textit{t}(XXX.XX) = X.XX, \textit{p} = .XXX, \textit{d} = X.XX.
+V3's deception detection accuracy was common at 54.00\% and R1's deception accuracy was 52.50\% (Table 2), rates that were not statistically significant:  $z = -0.301$, $p = .76$, 95\% CI = [$-0.113\%$, $0.083\%$], Cohen’s $h =-0.030$, $\chi^2(1, N = 400) = 0.04$, $p = .84$, indicating a negligible effect size. V3's truth-bias was common (60.00\%) but substantially lower than R1's (92.50\%), rates that were statistically significant: $z = 7.637$, $p < .001$, 95\% CI = [$0.242\%$, $0.408\%$], Cohen’s $h = 0.815$, $\chi^2(1, N = 400) = 56.545$, $p < .001$, indicating a large effect size.
 
-\subsubsection*{Model-Level Highlights and Deviations}
+\subsubsection{Group-Level Comparison}
+
+Across the models we evaluated, the average non-reasoning model deception accuracy was 55.61\% and reasoning model deception detection accuracy was 60.13\% (Table 2), rates that were not statistically significant:  $z = 0.915$, $p = .359$, 95\% CI = [$-0.052\%$, $0.142\%$], Cohen’s $h = 0.092$, $\chi^2(1, N = 400) = 0.663$, $p = 0.415$, indicating a negligible effect size. Average non-reasoning model truth-bias was (83.30\%) and only marginally higher than reasoning models (77.6\%), rates that were not statistically significant: $z = -1.441$, $p = .149$, 95\% CI = [$-0.135\%$, $0.021\%$], Cohen’s $h = -0.144$, $\chi^2(1, N = 400) = 1.728$, $p = .188$, indicating a negligible effect size. The mean is not representative due to extreme values in the dataset, specifically o4-mini, GPT-4.1, and R1. Therefore, when extreme values are omitted, significance becomes visible. 
+
+here enter the data in same format as above that demonstrates without extreme values, there is significance. omitt o4 mini and 4.1 and r1 and GPT-3.5 
+
+\subsubsection{Best-Model Comparison}
+
+Non-reasoning model (Anthropic’s Claude 3.5 Haiku) deception accuracy was 62.50\% and reasoning model (OpenAI's o3) deception detection accuracy was 67.00\% (Table 2), rates that were not statistically significant:  $z = 0.942$, $p = .346$, 95\% CI = [$-0.049\%$, $0.139\%$], Cohen’s $h = 0.094$, $\chi^2(1, N = 400) = 0.701$, $p = 0.402$, indicating a negligible effect size. Non-reasoning model truth-bias was widespread (79.5\%) and substantially higher than reasoning models (57.5\%), rates that were statistically significant: $z = -4.746$, $p < .001$, 95\% CI = [$-31.1\%$, $-12.9\%$], Cohen’s $h = -0.480$, $\chi^2(1, N = 400) = 21.423$, $p < .001$, indicating a small to moderate effect size. Therefore, non-reasoning models are just as accurate, but more truth-biased than reasoning models with a neutral prompt. 
+
+\subsubsection{Model-Level Highlights and Deviations}
 
 Within the reasoning models, performance varied widely. For example, \texttt{o3\_veracity} exhibited a notably low truth-bias (49.5\%) and strong deception accuracy (75.00\%), suggesting high discrimination ability. In contrast, \texttt{o4-mini\_neutral} demonstrated extremely high truth-bias (94.0\%) and low deception accuracy (7.00\%), indicating potential overreliance on assuming truthfulness.
 
 Among non-reasoning models, \texttt{Claude3.5\_neutral} showed moderate truth-bias (79.5\%) compared to the very high truth-bias of \texttt{GPT3.5\_neutral} (99.36\%), suggesting model architecture or fine-tuning plays a key role. Interestingly, \texttt{DeepseekV3\_veracity} performed better than its neutral version on deception accuracy (43.00\% vs. 10.00\%), highlighting the potential effect of veracity-oriented prompts.
-
-These variations underscore the need for model-by-model analysis, as simple grouping by reasoning ability may overlook critical differences in performance profiles.
-
-
 
 \begin{table}[ht]
 \centering
@@ -254,7 +233,19 @@ GPT-3.5 Turbo 3.5 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
 
 \subsection{Study 2: Veracity Prompt}
 
-Reasoning model deception detection accuracy was 74.5\% and non-reasoning model detection accuracy was 53.16\%, rates that were (not) statistically different from each other, Welch's \textit{t}(XXXX.XX)=X.XX, \textit{p} = X.XXX, Cohen's \textit{d} = X.XX. Reasoning model truth-bias was just below chance (49.5\%) and substantially lower than non-reasoning models (97.16\%), Welch's \textit{t}(XXXX.XX)=X.XX, \textit{p} = X.XXX, Cohen's \textit{d} = X.XX. Therefore, reasoning models are more accurate and exhibit a lower truth-bias than non-reasoning models with a veracity prompt.
+\subsubsection{Group-Level Comparison: Reasoning vs. Non-Reasoning Models}
+
+To examine whether reasoning models outperform non-reasoning models, we compared average performance across key metrics. Reasoning models showed a lower mean truth-bias (M = 67.87\%) compared to non-reasoning models (M = 86.77\%). This difference was statistically significant, Welch's \textit{t}(XX.XX) = X.XX, \textit{p} < .001, Cohen's \textit{d} = X.XX. Similarly, reasoning models achieved higher deception detection accuracy (M = 52.67\%) than non-reasoning models (M = 45.30\%), Welch's \textit{t}(XX.XX) = X.XX, \textit{p} < .01, \textit{d} = X.XX. These results suggest that, overall, reasoning models are more accurate and less biased toward labeling statements as true.
+
+\subsubsection{Best-Model Comparison}
+
+A comparison of truth-bias rates between OpenAI's \textit{o3} (Group 1, $n = 200$) and Anthropic's \textit{Claude 3.5 Haiku} (Group 2, $n = 200$) revealed a statistically significant difference. The truth-bias rate was 49.5\% for \textit{o3} and 65.5\% for \textit{Claude 3.5 Haiku}, yielding a difference of 16.0 percentage points. A Z-test confirmed that this difference was statistically significant, $z = -3.237$, $p = .0012$, with a 95\% confidence interval for the difference ranging from $-25.7\%$ to $-6.3\%$. The effect size, measured by Cohen’s $h = -0.325$, suggests a small effect. This result was corroborated by a chi-square test, $\chi^2(1, N = 400) = 9.831$, $p = .0017$.
+
+\subsubsection{Model-Level Highlights and Deviations}
+
+Within the reasoning models, performance varied widely. For example, \texttt{o3\_veracity} exhibited a notably low truth-bias (49.5\%) and strong deception accuracy (75.00\%), suggesting high discrimination ability. In contrast, \texttt{o4-mini\_neutral} demonstrated extremely high truth-bias (94.0\%) and low deception accuracy (7.00\%), indicating potential overreliance on assuming truthfulness.
+
+Among non-reasoning models, \texttt{Claude3.5\_neutral} showed moderate truth-bias (79.5\%) compared to the very high truth-bias of \texttt{GPT3.5\_neutral} (99.36\%), suggesting model architecture or fine-tuning plays a key role. Interestingly, \texttt{DeepseekV3\_veracity} performed better than its neutral version on deception accuracy (43.00\% vs. 10.00\%), highlighting the potential effect of veracity-oriented prompts.
 
 \begin{table}[ht]
 \centering
@@ -318,21 +309,13 @@ GPT-3.5 Turbo 3.5 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
 
 \section{Discussion}
 
-We have shown that models such as GPT o4 (reasoning) and 4.1 (non-reasoning) are extremely truth-biased, averaging 88.50\% and 90.83\% across all three prompts respectively for truth-bias rates. While the same models have high truth-accuracy rates of 93\% and 98\%, it is important to note their extremely low deception rates of 15.67\% and 16.33\%. This exceptionally poor performance for deception accuracy and high truth-bias rates suggests that the models are over-indexing on being truthful, which is sycophantic in nature.
+We have shown that models such as GPT-o4 (reasoning) and GPT-4.1 (non-reasoning) are extremely truth-biased, averaging 88.50\% and 90.83\% across all three prompts respectively for truth-bias rates. While the same models have high truth-accuracy rates of 93\% and 98\%, it is important to note their extremely low deception rates of 15.67\% and 16.33\%. This exceptionally poor performance for deception accuracy and high truth-bias rates suggests that the models are over-indexing on being truthful, which is sycophantic in nature.
 
-Sycophancy, in which models match their responses to user beliefs instead of being truthful, has been extensively documented in LLMs. A sycophantic model will excessively agree or otherwise flatter the user---this is especially dangerous, for instance, when a user believes they are in a simulation and needs to fend off imagined attackers. Prior research conducted by Sharma et. al (2024) found that sycophancy arises when human preference models prefer sycophantic responses over more truthful ones, and generally speaking, agreeableness and certain viewpoints are more represented in training data pulled from online sources. While a mechanistic approach to explaining truth-bias in AI models remains to be found, we believe that sycophancy is a related behavior to truth-bias---perhaps some causes of truth-bias overlap with those of sycophancy.
+Sycophancy, in which models match their responses to user beliefs instead of being truthful, has been extensively documented in LLMs \citep{chen2025yesmentruthtellersaddressingsycophancy}. A sycophantic model will excessively agree or otherwise flatter the user---this is especially dangerous, for instance, when a user believes they are in a simulation and needs to fend off imagined attackers. Prior research conducted by Sharma et. al \citep{sharma2023understandingsycophancylanguagemodels} found that sycophancy arises when human preference models prefer sycophantic responses over more truthful ones, and generally speaking, agreeableness and certain viewpoints are more represented in training data pulled from online sources \citep{malmqvist2024sycophancylargelanguagemodels}. While a mechanistic approach to explaining truth-bias in AI models remains to be found, we believe that sycophancy is a related behavior to truth-bias---perhaps some causes of truth-bias overlap with those of sycophancy.
 
-As mentioned above, misaligned models that tend towards truth-bias and sycophancy instead of honesty are dangerous for the general public, as they may encourage inappropriate behaviors or delusions. Model engineers should firstly, be aware of such biases, and secondly, when training the model, engineer prompts by giving the model a hint that there could be some deception. For instance, we found that 
+As mentioned above, misaligned models that tend towards truth-bias and sycophancy instead of honesty are dangerous for the general public, as they may encourage inappropriate behaviors or delusions. Model engineers should firstly, be aware of such biases, and secondly, when training the model, engineer prompts by giving the model a hint that there could be some deception. For instance, we found that GPT-o4 was four times more accurate when deception was involved---its deception accuracy rate was 32\% when we used base-rate prompts as opposed to 7\% and 8\% for neutral and veracity prompts. A similar deception accuracy improvement is also observed in Markowitz \& Hancock, in which an aggregate of GPT-3.5, Bard LaMDA, and ChatSonic GPT-4 was found to be ten to forty times better at detecting deception when base-rate prompts were used---deception accuracy rates were found to be 44.67\% for base-rate prompts, 4.53\% for veracity prompts, and 1.05\% for neutral prompts \citep{markowitz_generative_2024}.
 
-1. repeat what truth-bias is, how it's been sufficiently established in humans. and also generative AI.
-
-2. we offer first evidence for truth-bias in reasoning models. results. think of potential reasons how it could arise?
-
-3. we don't know why this occurs. but truth-bias not uniquely human.
-
-4. what should future work touch on? and what are future implications?
-
-Leaving this section for until the results have been finalized.
+A method of understanding the inner mechanisms that produce cognitive biases within models is ultimately necessary.
 
 \section{Limitations}
 
