@@ -233,20 +233,6 @@ GPT-3.5 Turbo 3.5 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
 
 \subsection{Study 2: Veracity Prompt}
 
-\subsubsection{Group-Level Comparison: Reasoning vs. Non-Reasoning Models}
-
-To examine whether reasoning models outperform non-reasoning models, we compared average performance across key metrics. Reasoning models showed a lower mean truth-bias (M = 67.87\%) compared to non-reasoning models (M = 86.77\%). This difference was statistically significant, Welch's \textit{t}(XX.XX) = X.XX, \textit{p} < .001, Cohen's \textit{d} = X.XX. Similarly, reasoning models achieved higher deception detection accuracy (M = 52.67\%) than non-reasoning models (M = 45.30\%), Welch's \textit{t}(XX.XX) = X.XX, \textit{p} < .01, \textit{d} = X.XX. These results suggest that, overall, reasoning models are more accurate and less biased toward labeling statements as true.
-
-\subsubsection{Best-Model Comparison}
-
-A comparison of truth-bias rates between OpenAI's \textit{o3} (Group 1, $n = 200$) and Anthropic's \textit{Claude 3.5 Haiku} (Group 2, $n = 200$) revealed a statistically significant difference. The truth-bias rate was 49.5\% for \textit{o3} and 65.5\% for \textit{Claude 3.5 Haiku}, yielding a difference of 16.0 percentage points. A Z-test confirmed that this difference was statistically significant, $z = -3.237$, $p = .0012$, with a 95\% confidence interval for the difference ranging from $-25.7\%$ to $-6.3\%$. The effect size, measured by Cohen’s $h = -0.325$, suggests a small effect. This result was corroborated by a chi-square test, $\chi^2(1, N = 400) = 9.831$, $p = .0017$.
-
-\subsubsection{Model-Level Highlights and Deviations}
-
-Within the reasoning models, performance varied widely. For example, \texttt{o3\_veracity} exhibited a notably low truth-bias (49.5\%) and strong deception accuracy (75.00\%), suggesting high discrimination ability. In contrast, \texttt{o4-mini\_neutral} demonstrated extremely high truth-bias (94.0\%) and low deception accuracy (7.00\%), indicating potential overreliance on assuming truthfulness.
-
-Among non-reasoning models, \texttt{Claude3.5\_neutral} showed moderate truth-bias (79.5\%) compared to the very high truth-bias of \texttt{GPT3.5\_neutral} (99.36\%), suggesting model architecture or fine-tuning plays a key role. Interestingly, \texttt{DeepseekV3\_veracity} performed better than its neutral version on deception accuracy (43.00\% vs. 10.00\%), highlighting the potential effect of veracity-oriented prompts.
-
 \begin{table}[ht]
 \centering
 \caption{Reasoning vs. Non-Reasoning Models in Study 2 (Veracity Prompt)}
@@ -277,7 +263,7 @@ GPT-3.5 Turbo 3.5 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
 
 \subsection{Study 3: Base-Rate Prompt}
 
-Reasoning model deception detection accuracy was 67.\% and non-reasoning model detection accuracy was 61.33\%, rates that were (not) statistically different from each other, Welch's \textit{t}(XXXX.XX)=X.XX, \textit{p} = X.XXX, Cohen's \textit{d} = X.XX. Reasoning model truth-bias was just below chance (49.5\%) and substantially lower than non-reasoning models (97.16\%), Welch's \textit{t}(XXXX.XX)=X.XX, \textit{p} = X.XXX, Cohen's \textit{d} = X.XX. Therefore, reasoning models are slightly more accurate and exhibit a slightly lower truth-bias than non-reasoning models with a base-rate prompt.
+...
 
 \begin{table}[ht]
 \centering
