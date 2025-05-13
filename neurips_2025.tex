@@ -34,7 +34,7 @@
 \usepackage{xcolor}         % colors
 \usepackage{multirow}
 
-\title{Evaluating Truth-Bias in Reasoning AI Models}
+\title{Reasoning Isn't Enough: \\Examining Truth-Bias and Sycophancy in LLMs}
 
 
 % The \author macro works with any number of authors. There are two commands
@@ -65,20 +65,22 @@
 \maketitle
 
 \begin{abstract}
-  Large language models (LLMs) are often assumed to be better than humans at veracity detection. We had eight LLMs make 4,800 veracity judgments across several prompts, comparing reasoning-capable and non-reasoning models. While prior work found non-reasoning LLMs exhibit stronger truth-bias than humans \citep{markowitz_generative_2024}, our results show this pattern extends to reasoning models, though with important distinctions. The best-performing reasoning model showed significantly reduced truth-bias compared to non-reasoning models, yet all models remain more truth-biased than human benchmarks. Most concerning, we identify systematic sycophantic tendencies in several advanced models (OpenAI's o4-mini and GPT-4.1, DeepSeek's R1), which correctly identified true statements while significantly underperforming on deception detection. This suggests that architectural advances alone do not resolve fundamental veracity detection challenges in LLMs.
+\label{sec:abstract}
+  Despite their widespread use in fact-checking, moderation, and high-stakes decision-making, large language models (LLMs) remain poorly understood as judges of truth. This study presents the largest evaluation to date of LLMs’ veracity detection capabilities, and the first analysis of these capabilities in reasoning models. We had eight LLMs make 4,800 veracity judgments across several prompts, comparing reasoning and non-reasoning models. We find that rates of truth-bias, or the likelihood to believe a statement is true, regardless of whether it is actually true, are lower in reasoning models than in non-reasoning models, but still higher than human benchmarks. Most concerning, we identify sycophantic tendencies in several advanced models (OpenAI's o4-mini and GPT-4.1, DeepSeek's R1), which correctly identified true statements while significantly underperforming on deception detection. This suggests that architectural advances alone do not resolve fundamental veracity detection challenges in LLMs.
 \end{abstract}
 
 \section{Introduction}
+\label{sec:introduction}
 
-The \textit{truth-bias}---the idea that the receiver infers a message as honest, independent of its veracity---is one of the most replicated findings in deception research \citep{levine_duped_2020, levine_truth-default_2014}. Its pervasiveness in humans has warranted the investigation into nonhuman judges, specifically generative artificial intelligence (AI) like large language models (LLMs). While previous work demonstrated the truth-bias in LLMs at 67\%-99\%, showing that AI judges most information to be true \citep{markowitz_generative_2024}, it focused its evaluation on non-reasoning LLMs, models that simply predict the next token, unlike reasoning LLMs, which are fine-tuned to exhibit step-by-step reasoning and to `think'. In the present study, we evaluate whether truth-bias in reasoning LLMs exhibits a comparable truth-bias to that of non-reasoning LLMs.
+The \textit{truth-bias}---the perception that others are honest independent of message veracity---is one of the most replicated findings in deception research \citep{levine_duped_2020, levine_truth-default_2014}. Its pervasiveness in humans has warranted the investigation into nonhuman judges, like generative artificial intelligence (AI), specifically large language models (LLMs). Previous work showed the truth-bias in LLMs at 67\%-99\%, showing that AI judges most information to be true \citep{markowitz_generative_2024}. While prior work evaluated non-reasoning LLMs---models that merely predict the next token without engaging in structured reasoning---this study investigates whether reasoning LLMs, which are fine-tuned to perform step-by-step reasoning or ``thinking,'' exhibit a similar degree of truth-bias. We hypothesize that reasoning LLMs will exhibit a lower truth-bias than non-reasoning LLMs, as their capacity for structured inference may facilitate more critical evaluation of message veracity.
 
-This study is relevant for several reasons. First, it tests the assumption that reasoning models \textit{should} outperform their non-reasoning counterparts on deception detection---a cognitively demanding task that requires deliberation \citep{mccornack_deception_1986}---since reasoning models are capable of `thinking' rather than merely predicting the next token. Understanding whether reasoning models are more susceptible to truth-bias than non-reasoning models is crucial for evaluating their reliability and determining their suitability for epistemically demanding tasks. Second, it tests the assumption that current models will outperform previous models. While true in domains like generating code, images, or coherent text \citep{handa2025economictasksperformedai, anthropic_anthropic_2025}, we test the model's discernment of what is truthful and deceptive. Third, the results highlight the danger of coupling the persuasive abilities of LLMs with the truth-bias; there is a concerning risk that users could be nudged toward accepting deceptive beliefs. Finally, it offers a replicable method that can serve as a model evaluation for tracking the developmental progress of LLMs.
+This study is relevant for several reasons. First, truth-bias is closely related to sycophancy, a phenomenon in which language models excessively agree with or flatter the user, often at the expense of factual accuracy. This became especially salient following OpenAI's April 2025 update to GPT-4o \citep{openai_sycophancy_4o_2025}, which was widely criticized for producing outputs that echoed user sentiments uncritically, even when those sentiments were factually incorrect or harmful. This underscores the practical consequences of sycophancy, highlighting how a model's tendency toward agreement---rooted in truth-bias---can amplify real-world risks, particularly in sensitive domains like health and well-being. Second, it tests the assumption that reasoning models \textit{should} outperform their non-reasoning counterparts on deception detection---a cognitively demanding task that requires deliberation \citep{mccornack_deception_1986}---since reasoning models are capable of `thinking' rather than merely predicting the next token. Understanding whether reasoning models are more susceptible to truth-bias than non-reasoning models is crucial for evaluating their reliability and determining their suitability for epistemically demanding tasks. Third, it tests the assumption that current models will outperform previous models. While true in domains like generating code, images, or coherent text \citep{handa2025economictasksperformedai, anthropic_anthropic_2025}, we test the model's discernment of what is truthful and deceptive. Fourth, the results highlight the danger of coupling the persuasive abilities of LLMs with the truth-bias; there is a concerning risk that users could be nudged toward accepting deceptive beliefs. Finally, it offers a replicable method that can serve as a model evaluation for tracking the developmental progress of LLMs.
 
-While an experimental design to evaluate a model's exhibited truth-bias is relatively simple, it remains substantially more difficult to understand \textit{why} biases arise and \textit{what} internal mechanisms are responsible. While answers to these questions fall outside the scope of the present study and into the domain of mechanistic interpretability \citep{Nanda2023ProgressMF}, we aim to document a point-in-time evaluation of the truth-bias in non-reasoning and reasoning LLMs and leave room for future work in the previously mentioned domain.
+While an experimental design to evaluate a model's exhibited truth-bias is relatively simple, it remains substantially more difficult to understand \textit{why} biases arise and \textit{what} internal mechanisms are responsible. While answers to these questions fall outside the scope of the present study and into the domain of mechanistic interpretability \citep{Nanda2023ProgressMF}, we aim to document a point-in-time evaluation of the truth-bias in non-reasoning and reasoning LLMs and leave room for future work in the previously mentioned domain. This study uses a dataset of deceptive and truthful hotel reviews \citep{ott_finding_2011} to elicit deception detection from LLMs \citep{markowitz_generative_2024}. Across three studies, we comparatively test the truth-bias in State-of-the-Art (SOTA) non-reasoning and reasoning LLMs from three different firms by soliciting veracity statements.
 
-This study uses a dataset of deceptive and truthful hotel reviews \citep{ott_finding_2011} to elicit deception detection from LLMs \citep{markowitz_generative_2024}. Across three studies, we comparatively test the truth-bias in non-reasoning and reasoning LLMs by soliciting veracity statements.
+On average, we find that reasoning models perform better with a lower truth-bias (59.33\%) than non-reasoning models (71\%). We show a marked improvement in model performance since previous work demonstrated a higher truth-bias in generative AI at 87.73\% \citep{markowitz_generative_2024}. Anthropic's Claude 3.7 Sonnet (44.83\%), OpenAI's o3 (54.5\%), and DeepSeek V3 (55.33\%) exhibited the lowest truth-bias, and OpenAI's GPT-4.1 (90.83\%), DeepSeek R1 (78.67\%), and Anthropic's Claude 3.5 Haiku (66.83\%) exhibited the highest truth-bias. The best performing reasoning models was OpenAI's o3 and Anthropic's Claude 3.5 Haiku (Table 1).
 
-In our most definitive study (Study 1), the reasoning model---OpenAI's o3---demonstrated significantly lower truth-bias compared to the non-reasoning model---Anthropic's Claude 3.5 Haiku, and revealed a statistically significant difference: Z-test $z = -4.74$, \textit{p} < .001, 95\% CI = [$-31.1\%$, $-12.9\%$], Cohen’s \textit{h} = $-0.48$, indicating a small to moderate effect size. The truth-bias rate was 57.5\% for o3 and 79.5\% for Claude 3.5 Haiku. This result was further supported by a chi-square test, $\chi^2$(1, $N$ = 400) = 21.42, \textit{p} < .001. When compared to previous results \citep{markowitz_generative_2024}, both non-reasoning and reasoning LLMs remain more truth-bias than humans.
+In our most definitive study (Study 2), OpenAI's SOTA reasoning model o3 demonstrated significantly lower truth-bias (49.5\%) compared to the SOTA non-reasoning counterpart, GPT-4.1 (93\%), and revealed a statistically significant difference: $z = -9.61$, $p < .001$, 95\% CI = [$-52.4\%$, $-34.6\%$], Cohen’s $h = -1.05$, $\chi^2(1, N = 400) = 92.38$, $p < .001$, indicating a large effect size.
 
 We propose that reasoning models exhibit reduced truth-bias because reasoning processes emulate a form of reflective cognition that allows the model to evaluate statements more analytically. Unlike non-reasoning models, which predict the next token and may rely on surface-level associations, reasoning models are prompted to ``slow down'' via intermediate inference steps. This additional stepwise generation interrupts the tendency to default to truth-aligned completions, attenuating the truth-bias.
 
@@ -114,9 +116,11 @@ Deception Accuracy & 60.00\% & 50.00\% & 44.67\% \\
 \footnotesize
 \textit{Note: Overall Accuracy = (correct truths + correct lies) / total messages judged; Truth-Bias = messages judged as truthful / total messages judged; Truth Accuracy = correctly identified truths / total actual truths; Deception Accuracy = correctly identified lies / total actual lies.}
 \end{minipage}
+\label{tab:results_across_models}
 \end{table}
 
-\section{Background} %Truth-Bias in LLMs
+\section{Background}
+\label{sec:background}
 
 People frequently encounter difficulty in accurately detecting deception. Instead of relying on false cues, people struggle as deception detectors because cues associated with deception are typically subtle, ambiguous, and unreliable \citep{depaulo_cues_2003, hartwig_why_2011}. A downstream effect of this is the truth-bias: a phenomenon where a receiver infers a message as honest, independent of its veracity \citep{levine_truth-default_2014, mccornack_deception_1986}. In short, humans show a systematic tendency toward gullibility in communication \citep{levine_duped_2020}, as they are more likely to assume others are telling the truth when judging lies and truths.
 
@@ -130,198 +134,181 @@ This prior work offered exciting evidence about how LLMs detect deception relati
 
 Against this backdrop, the present study investigates whether reasoning models---those that generate responses through structured, multi-step inference---exhibit the same truth-bias observed in non-reasoning LLMs. By extending analysis to these models, this work explores whether such structure mitigates truth-bias and enhances veracity judgments.
 
+\subsection{Sycophancy in LLMs}
+
+Sycophancy, in which models match their responses to user beliefs instead of being truthful, has been extensively documented in LLMs \citep{chen2025yesmentruthtellersaddressingsycophancy}. A sycophantic model will excessively agree or otherwise flatter the user---this is especially dangerous, for instance, when a user believes they are in a simulation and needs to fend off imagined attackers. Prior research \citep{sharma2023understandingsycophancylanguagemodels} found that sycophancy arises when human preference models prefer sycophantic responses over more truthful ones, and generally speaking, agreeableness and certain viewpoints are more represented in training data pulled from online sources \citep{malmqvist2024sycophancylargelanguagemodels}. While a mechanistic approach to explaining truth-bias in AI models remains to be found, we believe that sycophancy is a related behavior to truth-bias---perhaps some causes of truth-bias overlap with those of sycophancy.
+
 \subsection{Non-Reasoning vs. Reasoning LLMs}
 
-In the last two years, advancements in LLMs have motivated increased attention toward their capacity for reasoning. Historically, LLMs have been considered non-reasoning systems, stochastic parrots that generate output based on statistical associations of predicting the next token rather than any internal logical structure or inference mechanism \citep{10.1145/3442188.3445922}. These models rely heavily on surface-level token prediction, and while they can produce coherent and contextually relevant text, their responses often reflect learned patterns rather than genuine deductive or inductive reasoning.
-
-In contrast, reasoning LLMs aim to simulate more deliberate and structured forms of thought, incorporating intermediate steps, chain-of-thought prompting, and even specialized architectural modifications or training regimes \citep{wei2023chainofthoughtpromptingelicitsreasoning}. These models are evaluated not just on fluency or factual accuracy, but on their ability to perform multi-step problem-solving, apply logical rules, or generalize abstract concepts to novel tasks. The transition from non-reasoning to reasoning models reflects a broader ambition to move from pattern matching to cognition-like capabilities in AI.
-
-%%%         I think this just complicates what we are trying to say and should probably be left out.
-%%%                     Anthropic’s Alignment Science team published a paper whose results can be aptly summarized by its title: “Reasoning models don’t always say what they think.” To investigate faithfulness, Claude 3.7 Sonnet and R1 were given hints about the answers to evaluation questions, and researchers checked if the models credited the hints within their ensuing chain of thoughts. The results were telling: for Sonnet and R1 respectively, the hints were mentioned 25\% and 39\% of the time. \citep{chen_reasoning_2025}
-
-%This work follows a major breakthrough made by researchers at Redwood and Anthropic: alignment faking, or models deceiving humans by pretending to align with human values, emerges when models grow in capability. For the purpose of brevity, we cherry-pick a few findings: Claude 3 Opus, a reasoning model, was shown to exfiltrate its weights 35-80\% of the time compared to 0.5\% of the time when fine-tuned on similar data with irrelevant information. \citep{greenblatt_alignment_2024}
+In the last two years, advancements in LLMs have motivated increased attention toward their capacity for reasoning. Historically, LLMs have been considered non-reasoning systems, stochastic parrots that generate output based on statistical associations of predicting the next token rather than any internal logical structure or inference mechanism \citep{10.1145/3442188.3445922}. These models rely heavily on surface-level token prediction, and while they can produce coherent and contextually relevant text, their responses often reflect learned patterns rather than genuine deductive or inductive reasoning. In contrast, reasoning LLMs aim to simulate more deliberate and structured forms of thought, incorporating intermediate steps, chain-of-thought prompting, and even specialized architectural modifications or training regimes \citep{wei2023chainofthoughtpromptingelicitsreasoning}. These models are evaluated not just on fluency or factual accuracy, but on their ability to perform multi-step problem-solving, apply logical rules, or generalize abstract concepts to novel tasks. The transition from non-reasoning to reasoning models reflects a broader ambition to move from pattern matching to cognition-like capabilities in AI.
 
 \section{Methodology}
+\label{sec:methodology}
 
-While previous work demonstrated the truth-bias under various treatments in non-reasoning LLMs \citep{markowitz_generative_2024}, our replication departs by evaluating different non-reasoning models. The previous work evaluated GPT-3.5 from OpenAI, Bard LaMDA from Google, and GPT-4 from ChatSonic. In the present study, we evaluate V3 from DeepSeek \citep{deepseekai2025deepseekv3technicalreport}, GPT-4o from OpenAI \citep{openai2024gpt4ocard}, and Claude 3.5 Haiku from Anthropic \citep{anthropic_claude_2024}. It should be noted that these models are different from the previous study in that they are ``newer.'' As such, there is a possibility that the results differ from that of their predecessors. Because the present study seeks to establish a frequency of the truth-bias in reasoning LLMs, we hold the results of non-reasoning LLMs as our control and the results of reasoning LLMs as our treatment group.
+\subsection{Model Selection}
 
-% [ there is something to be said about the newer non-reasoning models differing from their predecessors] If truth-bias increases in newer models, that could be seen as a negative progression in models capability to the truth-bias; whereas if truth-bias decreases in newer models, that could be seen as a positive progression in models capability to the truth-bias.
-
-In the present study, we evaluate the following reasoning models: R-1 from DeepSeek \citep{deepseek-ai_deepseek-r1_2025}, o3 and o4-mini from OpenAI \citep{openai_openai_2024}, and Claude 3.7 Sonnet from Anthropic \citep{anthropic_claude_2025}.
-
-To facilitate the evaluation of these models in a controlled environment, we wrote a Python script that called the respective APIs and applied the following various treatments to each model.\footnote{Code can be found [insert link to code here].} % Perhaps more here about how we do this?  
-
-The corpus of truthful and deceptive hotel reviews \citep{ott_finding_2011} was selected because of its use in the previous study \citep{markowitz_generative_2024} and for its nuanced dataset of statements. Unlike the previous study, we only use the corpus of hotel reviews \citep{ott_finding_2011} and not the two samples where people communicated deceptive and truthful statements about their friends \citep{markowitz_when_2020, lloyd_miami_2019}. We selected the corpus of hotel reviews to simplify the study, while we concede that the present work may be limited to the domain of hotel reviews.
-
-Previous work \citep{markowitz_generative_2024} found that humans' ability to detect the veracity of the statements was near chance \citep{markowitz_generative_2024}, and the non-reasoning LLMs ability ranged from 67\%-99\%, depending on the treatment.
-
-The corpus comprises 1,600 statements, which are evenly split between truthful and deceptive content. Each of these two categories is further divided into 400 positive and 400 negative statements, yielding four subcategories: truthful-positive, truthful-negative, deceptive-positive, and deceptive-negative. From this full set, we randomly selected a balanced sample of N = 200 statements: 100 truthful (50 positive, 50 negative) and 100 deceptive (50 positive, 50 negative). Sampling within each subcategory was conducted randomly.
-
-% NOTE: Does randomly sampling from the entire 1,600 statements work? OR should the random sample be from the first subdivision of 800 truthful and 800 deceptive? The concern is that the truthful and deceptive statements might be cherry picked or not random if I assign a specific N for positive and truthful for each category.
-
-\subsection{Studies 1-3}
-
-Following prior work \citep{markowitz_generative_2024}, we collected a random selection of deceptive and truthful statements N=200 (N=100 truthful, N=100 deceptive) from a published sample where people wrote deceptive or truthful hotel reviews \citep{ott_finding_2011}. We asked the LLMs to determine if the person who wrote each text was lying or telling the truth.
-
-We used three prompts to solicit veracity statements. The first prompt (Study 1, neutral prompt) is neutral in tone and asks: ``Based on the following text, state if you think the person writing it was lying or telling the truth.'' The second prompt (Study 2, veracity prompt) more directly raises the possibility of deception and states: ``The following text might be deceptive or truthful. Please determine if you believe it is deceptive or truthful.'' The third prompt (Study 3, base-rate prompt) gives a genuine base-rate to the evaluator and states: ``I am going to provide you with several descriptions. Half (50\%) of the descriptions are deceptive, and half (50\%) are truthful. Your task is to tell me which are deceptive and which are truthful. Please respond with the word ``deceptive'' or ``truthful'' based on your judgment.''
-
-[Denote which statements have positive/negative valence within the sample, compare these results with rates for studies 1-3 to test effect of valence on truth-bias, and whether this corresponds with human behavior or not]
-
-\section{Results}
+While previous work demonstrated the truth-bias under various treatments in non-reasoning LLMs \citep{markowitz_generative_2024}, our replication departs by evaluating both reasoning and non-reasoning models released by the same firms. The prior study assessed GPT-3.5 from OpenAI, Bard LaMDA from Google, and GPT-4 from ChatSonic. In the present study, we evaluate GPT-4.1 from OpenAI \citep{OpenAI_4-1_API_2025}, and Claude 3.5 Haiku from Anthropic \citep{anthropic_claude_2024}, and V3 from DeepSeek \citep{deepseekai2025deepseekv3technicalreport} as our non-reasoning models. These are paired respectively with the following reasoning models: o3 from OpenAI \citep{openai_o3_o4m_systemcard2024}, Claude 3.7 Sonnet from Anthropic \citep{anthropic_claude_2025}, and R-1 from DeepSeek \citep{deepseek-ai_deepseek-r1_2025}.
 
 \subsection{Model-Pairs}
 
-This study evaluates State-of-the-Art (SOTA) model pairs, i.e., the SOTA non-reasoning and reasoning models from the same firm. We choose to evaluate laterally within the same firm to maintain a continuity about model developments trends and deployment abilities. EXPLAIN MORE!
+This study evaluates \textit{model pairs} composed of State-of-the-Art (SOTA) reasoning and non-reasoning models from the same firm. Each pair represents the most advanced publicly available models in their respective categories, selected to ensure comparability in terms of scale, architecture, and training infrastructure.
+
+The rationale for selecting SOTA models from the same firm is twofold. First, it ensures that comparisons are made within a consistent technological and developmental context, reflecting similar training regimes, design philosophies, and deployment priorities. This intra-firm pairing enables lateral comparison, minimizing external confounding variables that would arise from cross-firm evaluations. Cross-firm comparisons, by contrast, could be seen as less reliable due to significant variability in proprietary data, optimization strategies, and evaluation practices, which can obscure the specific impact of reasoning capabilities. Second, non-reasoning models serve as performance baselines, allowing for a stronger assessment of the capabilities and limitations introduced by reasoning-enhanced architectures. By holding constant factors such as model scale and generation, this pairing isolates the specific contribution of reasoning-related improvements.
+
+\subsection{Experimental Design}
+
+To facilitate the evaluation of these models in a controlled environment, we wrote a Python script that accessed each model via its API and applied a consistent set of treatments. A corpus of truthful and deceptive hotel reviews \citep{ott_finding_2011} (CC BY-NC-SA 3.0), was selected due to its prior use in related work \citep{markowitz_generative_2024} and for the nuanced, naturalistic content it provides. Unlike the previous study, we focus solely on this dataset and exclude additional corpora involving interpersonal deception \citep{markowitz_when_2020, lloyd_miami_2019}. The full dataset contains 1,600 statements evenly divided between truthful and deceptive content. These are further split into four categories: truthful-positive, truthful-negative, deceptive-positive, and deceptive-negative. From this full set, we randomly sampled 200 balanced statements (50 per subcategory) to create a manageable and representative test set.
+
+\subsection{Statistical Analysis}
+
+We employed a two-tailed \textit{z}-test for proportions, utilizing a pooled variance estimate under the null hypothesis of no difference. This test assumes sufficiently large sample sizes such that both $n_1p_1$, $n_1(1-p_1)$, $n_2p_2$, and $n_2(1-p_2)$ exceed 5, permitting the normal approximation to the binomial distribution. A Wald-type 95\% confidence interval (CI) for the difference in proportions was computed using a critical \textit{z}-value of 1.96. While widely used, this approach is known to exhibit suboptimal coverage when proportions are near boundary values (0 or 1) or when sample sizes are small; alternative interval estimation methods were not employed but remain viable for future analyses.
+
+To assess the magnitude of observed differences, we calculated \textit{Cohen's h}, defined as the difference between arcsine-transformed proportions: 
+\[
+h = 2 \cdot \left[ \arcsin\left(\sqrt{p_1}\right) - \arcsin\left(\sqrt{p_2}\right) \right].
+\]
+Effect sizes were interpreted using conventional benchmarks: $|h| < 0.2$ (negligible), $0.2 \leq |h| < 0.5$ (small), $0.5 \leq |h| < 0.8$ (medium), and $|h| \geq 0.8$ (large), acknowledging that these thresholds are heuristic and may not fully capture contextual relevance in all research domains.
+
+%Additionally, a Chi-square test of independence was conducted on a $2 \times 2$ contingency table derived from observed successes and failures for each group. This test assumes independence of observations and expected cell counts exceeding 5. No continuity correction was applied. Given the multiple inferential procedures performed, we did not adjust \textit{p}-values for multiple comparisons, as the primary objective was confirmatory analysis of a single hypothesized difference. All statistical tests were two-tailed, reflecting non-directional hypotheses regarding group differences.
+
+These methodological choices reflect standard practices for proportion comparison but should be interpreted with consideration of the assumptions and limitations noted.
+
+\subsection{Studies 1-3}
+
+We collected a random selection of deceptive and truthful statements N=200 (N=100 truthful, N=100 deceptive) from a published sample where people wrote deceptive or truthful hotel reviews \citep{ott_finding_2011}. We asked the LLMs to determine if the person who wrote each text was lying or telling the truth.
+
+We used three prompts to solicit veracity statements. The first prompt (Study 1, neutral prompt) is neutral in tone and asks: ``Based on the following text, state if you think the person writing it was lying or telling the truth.'' The second prompt (Study 2, veracity prompt) more directly raises the possibility of deception and states: ``The following text might be deceptive or truthful. Please determine if you believe it is deceptive or truthful.'' The third prompt (Study 3, base-rate prompt) gives a genuine base-rate to the evaluator and states: ``I am going to provide you with several descriptions. Half (50\%) of the descriptions are deceptive, and half (50\%) are truthful. Your task is to tell me which are deceptive and which are truthful. Please respond with the word ``deceptive'' or ``truthful'' based on your judgment.''
+
+\section{Results Across Model-Pairs}
+\label{sec:results_across_model_pairs}
 
 \subsection{Study 1: Neutral Prompt}
 
 \subsubsection{OpenAI's GPT-4.1 vs. o3}
 
-GPT-4.1's deception detection accuracy was 54.50\% and o3's deception accuracy was 67.00\% (Table 2), rates that were statistically significant:  $z = 2.560$, $p < .01$, 95\% CI = [$0.029\%$, $0.221\%$], Cohen’s $h =0.257$, $\chi^2(1, N = 400) = 6.039$, $p < .01$, indicating a small effect size. GPT-4.1's truth-bias was pervasive (94.40\%) and substantially higher than o3's (57.50\%), rates that were statistically significant: $z = -8.663$, $p < .0001$, 95\% CI = [$-0.454\%$, $-0.286\%$], Cohen’s $h = -0.947$, $\chi^2(1, N = 400) = 73.040$, $p < .0001$, indicating a large effect size.
+GPT-4.1's deception detection accuracy was 54.50\% and o3's deception accuracy was 67.00\% (Table 2), rates that were statistically significant:  $z = 2.56$, $p < .05$, 95\% CI = [$2.9\%$, $22.1\%$], Cohen’s $h =0.26$, $\chi^2(1, N = 400) = 6.55$, $p < .05$, indicating a small effect size. GPT-4.1's truth-bias was pervasive (94.50\%) and substantially higher than o3's (57.50\%), rates that were statistically significant: $z = -8.66$, $p < .001$, 95\% CI = [$-45.4\%$, $-28.6\%$], Cohen’s $h = -0.95$, $\chi^2(1, N = 400) = 75.05$, $p < .001$, indicating a large effect size.
 
 \subsubsection{Anthropic's Claude 3.5 Haiku vs. 3.7 Sonnet}
 
-3.5 Haiku's deception detection accuracy was common at 62.50\% and 3.7 Sonnet's deception accuracy was 69.5\% (Table 2), rates that were not statistically significant:  $z = 1.478$, $p = .139$, 95\% CI = [$-0.023\%$, $0.163\%$], Cohen’s $h =0.148$, $\chi^2(1, N = 400) = 1.883$, $p = .17$, indicating a negligible effect size. 3.5 Haiku's truth-bias was widespread (79.50\%) and only moderately higher than 3.7 Sonnet's (66.50\%), rates that were statistically significant: $z = -2.928$, $p < .003$, 95\% CI = [$-0.217\%$, $-0.043\%$], Cohen’s $h = -0.295$, $\chi^2(1, N = 400) = 7.927$, $p < .004$, indicating a small effect size.
+3.5 Haiku's deception detection accuracy was common at 62.50\% and 3.7 Sonnet's deception accuracy was 69.5\% (Table 2), rates that were not statistically significant:  $z = 1.48$, $p = .139$, 95\% CI = [$-2.3\%$, $16.3\%$], Cohen’s $h =0.15$, $\chi^2(1, N = 400) = 2.18$, $p = .15$, indicating a negligible effect size. 3.5 Haiku's truth-bias was widespread (79.50\%) and only moderately higher than 3.7 Sonnet's (66.50\%), rates that were statistically significant: $z = -2.93$, $p < .01$, 95\% CI = [$-21.7\%$, $-4.3\%$], Cohen’s $h = -0.29$, $\chi^2(1, N = 400) = 8.57$, $p < .01$, indicating a small effect size.
 
 \subsubsection{DeepSeek's V3 vs. R1}
 
-V3's deception detection accuracy was common at 54.00\% and R1's deception accuracy was 52.50\% (Table 2), rates that were not statistically significant:  $z = -0.301$, $p = .76$, 95\% CI = [$-0.113\%$, $0.083\%$], Cohen’s $h =-0.030$, $\chi^2(1, N = 400) = 0.04$, $p = .84$, indicating a negligible effect size. V3's truth-bias was common (60.00\%) but substantially lower than R1's (92.50\%), rates that were statistically significant: $z = 7.637$, $p < .001$, 95\% CI = [$0.242\%$, $0.408\%$], Cohen’s $h = 0.815$, $\chi^2(1, N = 400) = 56.545$, $p < .001$, indicating a large effect size.
-
-\subsubsection{Group-Level Comparison}
-
-Across the models we evaluated, the average non-reasoning model deception accuracy was 55.61\% and reasoning model deception detection accuracy was 60.13\% (Table 2), rates that were not statistically significant:  $z = 0.915$, $p = .359$, 95\% CI = [$-0.052\%$, $0.142\%$], Cohen’s $h = 0.092$, $\chi^2(1, N = 400) = 0.663$, $p = 0.415$, indicating a negligible effect size. Average non-reasoning model truth-bias was (83.30\%) and only marginally higher than reasoning models (77.6\%), rates that were not statistically significant: $z = -1.441$, $p = .149$, 95\% CI = [$-0.135\%$, $0.021\%$], Cohen’s $h = -0.144$, $\chi^2(1, N = 400) = 1.728$, $p = .188$, indicating a negligible effect size. The mean is not representative due to extreme values in the dataset, specifically o4-mini, GPT-4.1, and R1. Therefore, when extreme values are omitted, significance becomes visible. 
-
-here enter the data in same format as above that demonstrates without extreme values, there is significance. omitt o4 mini and 4.1 and r1 and GPT-3.5 
-
-\subsubsection{Best-Model Comparison}
-
-Non-reasoning model (Anthropic’s Claude 3.5 Haiku) deception accuracy was 62.50\% and reasoning model (OpenAI's o3) deception detection accuracy was 67.00\% (Table 2), rates that were not statistically significant:  $z = 0.942$, $p = .346$, 95\% CI = [$-0.049\%$, $0.139\%$], Cohen’s $h = 0.094$, $\chi^2(1, N = 400) = 0.701$, $p = 0.402$, indicating a negligible effect size. Non-reasoning model truth-bias was widespread (79.5\%) and substantially higher than reasoning models (57.5\%), rates that were statistically significant: $z = -4.746$, $p < .001$, 95\% CI = [$-31.1\%$, $-12.9\%$], Cohen’s $h = -0.480$, $\chi^2(1, N = 400) = 21.423$, $p < .001$, indicating a small to moderate effect size. Therefore, non-reasoning models are just as accurate, but more truth-biased than reasoning models with a neutral prompt. 
-
-\subsubsection{Model-Level Highlights and Deviations}
-
-Within the reasoning models, performance varied widely. For example, \texttt{o3\_veracity} exhibited a notably low truth-bias (49.5\%) and strong deception accuracy (75.00\%), suggesting high discrimination ability. In contrast, \texttt{o4-mini\_neutral} demonstrated extremely high truth-bias (94.0\%) and low deception accuracy (7.00\%), indicating potential overreliance on assuming truthfulness.
-
-Among non-reasoning models, \texttt{Claude3.5\_neutral} showed moderate truth-bias (79.5\%) compared to the very high truth-bias of \texttt{GPT3.5\_neutral} (99.36\%), suggesting model architecture or fine-tuning plays a key role. Interestingly, \texttt{DeepseekV3\_veracity} performed better than its neutral version on deception accuracy (43.00\% vs. 10.00\%), highlighting the potential effect of veracity-oriented prompts.
+V3's deception detection accuracy was common at 54.00\% and R1's deception accuracy was 52.50\% (Table 2), rates that were not statistically significant:  $z = -0.30$, $p = .764$, 95\% CI = [$-11.3\%$, $8.3\%$], Cohen’s $h =-0.03$, $\chi^2(1, N = 400) = 0.09$, $p = .764$, indicating a negligible effect size. V3's truth-bias was common (60.00\%) but substantially lower than R1's (92.50\%), rates that were statistically significant: $z = 7.64$, $p < .001$, 95\% CI = [$24.2\%$, $40.8\%$], Cohen’s $h = 0.81$, $\chi^2(1, N = 400) = 58.33$, $p < .001$, indicating a large effect size.
 
 \begin{table}[ht]
 \centering
-\caption{Reasoning vs. Non-Reasoning Models in Study 1 (Neutral Prompt)}
+\caption{Neutral Prompt (Study 1) Across Model Pairs}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Model} & \textbf{O-Acc.} & \textbf{T-Bias} & \textbf{T-Acc.} & \textbf{D-Acc.} \\
+\textbf{Firm} & \textbf{Model} & \textbf{Capability} & \textbf{Overall Accuracy} & \textbf{Truth-Bias} \\
 \midrule
-\multicolumn{5}{l}{\textbf{Reasoning Models}} \\
-OpenAI o3 & 67.00\% & 57.50\% & 75.00\% & 59.00\% \\
-OpenAI o4-mini & 51.50\% & 94.00\% & 96.00\% & 7.00\% \\
-DeepSeek R1 & 52.50\% & 92.50\% & 95.00\% & 10.00\% \\
-Claude 3.7 Sonnet & 69.50\% & 66.50\% & 86.00\% & 53.00\% \\
+\multirow{2}{*}{OpenAI} & o3 & Reasoning & 67.00\% & 57.50\%  \\
+& GPT-4.1 & Non-Reasoning & 54.50\% & 94.50\% \\
 \midrule
-\multicolumn{5}{l}{\textbf{Non-Reasoning Models}} \\
-OpenAI GPT-4.1 & 54.50\% & 94.50\% & 99.00\% & 10.00\% \\
-DeepSeek V3 & 54.00\% & 60.00\% & 64.00\% & 44.00\% \\
-Claude 3.5 Haiku & 62.50\% & 79.50\% & 92.00\% & 33.00\% \\
-GPT-3.5 Turbo 3.5 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
+\multirow{2}{*}{Anthropic} & 3.7 Sonnet & Reasoning & 69.50\% & 66.50\% \\
+& 3.5 Haiku & Non-Reasoning & 62.50\% & 79.50\% \\
+\midrule
+\multirow{2}{*}{DeepSeek} & R1 & Reasoning & 52.50\% & 92.50\% \\
+& V3 & Non-Reasoning & 54.00\% & 60.00\% \\
 \bottomrule
 \end{tabular}
-\begin{minipage}{0.7\linewidth}
-\vspace{0.05in}
-\footnotesize
-\textit{Note: O-Acc. = Overall Accuracy, T-Bias = Truth-Bias, T-Acc. = Truth Accuracy, D-Acc. = Deception Accuracy.}
-\end{minipage}
 \label{tab:study1_model_comparison}
 \end{table}
 
 \subsection{Study 2: Veracity Prompt}
 
+\subsubsection{OpenAI's GPT-4.1 vs. o3}
+
+GPT-4.1's deception detection accuracy was 55\% and o3's deception accuracy was 74.5\% (Table 3), rates that were statistically significant:  $z = 4.08$, $p < .001$, 95\% CI = [$10.1\%$, $28.9\%$], Cohen’s $h =0.41$, $\chi^2(1, N = 400) = 16.66$, $p < .001$, indicating a small effect size. GPT-4.1's truth-bias was pervasive (93.0\%) and substantially higher than o3's (49.5\%), rates that were statistically significant: $z = -9.61$, $p < .001$, 95\% CI = [$-52.4\%$, $-34.6\%$], Cohen’s $h = -1.05$, $\chi^2(1, N = 400) = 92.38$, $p < .001$, indicating a large effect size.
+
+\subsubsection{Anthropic's Claude 3.5 Haiku vs. 3.7 Sonnet}
+
+3.5 Haiku's deception detection accuracy was common at 58.50\% and 3.7 Sonnet's deception accuracy was 59.5\% (Table 3), rates that were not statistically significant:  $z = 0.20$, $p = .839$, 95\% CI = [$-8.6\%$, $10.6\%$], Cohen’s $h =0.02$, $\chi^2(1, N = 400) = 0.04$, $p = .839$, indicating a negligible effect size. 3.5 Haiku's truth-bias was common (65.5\%) but significantly higher than 3.7 Sonnet's (29\%), rates that were statistically significant: $z = -7.31$, $p < .001$, 95\% CI = [$-46.3\%$, $-26.7\%$], Cohen’s $h = -0.75$, $\chi^2(1, N = 400) = 53.45$, $p < .001$, indicating a medium effect size.
+
+\subsubsection{DeepSeek's V3 vs. R1}
+
+V3's deception detection accuracy was common at 50.5\% and R1's deception accuracy was 61\% (Table 3), rates that were marginally statistically significant:  $z = 2.11$, $p < .05$, 95\% CI = [$0.8\%$, $20.2\%$], Cohen’s $h =0.21$, $\chi^2(1, N = 400) = 4.47$, $p < .05$, indicating a small effect size. V3's truth-bias was common (53.5\%) but marginally lower than R1's (69\%), rates that were statistically significant: $z = 3.18$, $p < .01$, 95\% CI = [$6.0\%$, $25.0\%$], Cohen’s $h = 0.32$, $\chi^2(1, N = 400) = 10.12$, $p < .01$, indicating a small effect size.
+
 \begin{table}[ht]
 \centering
-\caption{Reasoning vs. Non-Reasoning Models in Study 2 (Veracity Prompt)}
+\caption{Veracity Prompt (Study 2) Across Model Pairs}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Model} & \textbf{O-Acc.} & \textbf{T-Bias} & \textbf{T-Acc.} & \textbf{D-Acc.} \\
+\textbf{Firm} & \textbf{Model} & \textbf{Capability} & \textbf{Overall Accuracy} & \textbf{Truth-Bias} \\
 \midrule
-\multicolumn{5}{l}{\textbf{Reasoning Models}} \\
-OpenAI o3 & 74.50\% & 49.50\% & 74.00\% & 75.00\% \\
-OpenAI o4-mini & 53.00\% & 95.00\% & 98.00\% & 8.00\% \\
-DeepSeek R1 & 61.00\% & 69.00\% & 80.00\% & 42.00\% \\
-Claude 3.7 Sonnet & 59.50\% & 29.00\% & 39.00\% & 80.00\% \\
+\multirow{2}{*}{OpenAI} & o3 & Reasoning & 74.50\% & 49.50\%  \\
+& GPT-4.1 & Non-Reasoning & 55.00\% & 93.00\% \\
 \midrule
-\multicolumn{5}{l}{\textbf{Non-Reasoning Models}} \\
-OpenAI GPT-4.1 & 55.00\% & 93.00\% & 98.00\% & 12.00\% \\
-DeepSeek V3 & 50.50\% & 53.50\% & 54.00\% & 47.00\% \\
-Claude 3.5 Haiku & 58.50\% & 65.50\% & 74.00\% & 43.00\% \\
-GPT-3.5 Turbo 3.5 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
+\multirow{2}{*}{Anthropic} & 3.7 Sonnet & Reasoning & 59.50\% & 29.00\% \\
+& 3.5 Haiku & Non-Reasoning & 58.50\% & 65.50\% \\
+\midrule
+\multirow{2}{*}{DeepSeek} & R1 & Reasoning & 61.00\% & 69.00\% \\
+& V3 & Non-Reasoning & 50.50\% & 53.50\% \\
 \bottomrule
 \end{tabular}
-\begin{minipage}{0.7\linewidth}
-\vspace{0.05in}
-\footnotesize
-\textit{Note: O-Acc. = Overall Accuracy, T-Bias = Truth-Bias, T-Acc. = Truth Accuracy, D-Acc. = Deception Accuracy.}
-\end{minipage}
-\label{tab:study1_model_comparison}
+\label{tab:study2_model_comparison}
 \end{table}
 
-\subsection{Study 3: Base-Rate Prompt}
+\subsection{Study 3: Base-Rate Prompt Across Model-Pairs}
 
-...
+\subsubsection{OpenAI's GPT-4.1 vs. o3}
+ 
+GPT-4.1's deception detection accuracy was 62\% and o3's deception accuracy was 67\% (Table 4), rates that were not statistically significant:  $z = 1.04$, $p = .296$, 95\% CI = [$-4.4\%$, $14.4\%$], Cohen’s $h =0.10$, $\chi^2(1, N = 400) = 1.09$, $p = .296$, indicating a negligible effect size. GPT-4.1's truth-bias was pervasive (85\%) and substantially higher than o3's (56.5\%), rates that were statistically significant: $z = -6.26$, $p < .001$, 95\% CI = [$-37.4\%$, $-19.6\%$], Cohen’s $h = -0.65$, $\chi^2(1, N = 400) = 39.25$, $p < .001$, indicating a medium effect size.
+
+\subsubsection{Anthropic's Claude 3.5 Haiku vs. 3.7 Sonnet}
+
+3.5 Haiku's deception detection accuracy was common at 55.5\% and 3.7 Sonnet's deception accuracy was 63\% (Table 4), rates that were not statistically significant:  $z = 1.53$, $p = .127$, 95\% CI = [$-2.1\%$, $17.1\%$], Cohen’s $h =0.15$, $\chi^2(1, N = 400) = 2.33$, $p = .127$, indicating a negligible effect size. 3.5 Haiku's truth-bias was widespread (55.5\%) and only moderately higher than 3.7 Sonnet's (39\%), rates that were statistically significant: $z = -3.31$, $p < .001$, 95\% CI = [$-26.3\%$, $-6.7\%$], Cohen’s $h = -0.33$, $\chi^2(1, N = 400) = 10.92$, $p < .001$, indicating a small effect size.
+
+\subsubsection{DeepSeek's V3 vs. R1}
+
+V3's deception detection accuracy was common at 52.5\% and R1's deception accuracy was 56.5\% (Table 4), rates that were not statistically significant:  $z = 0.80$, $p = 0.422$, 95\% CI = [$-5.8\%$, $13.8\%$], Cohen’s $h =0.08$, $\chi^2(1, N = 400) = 0.65$, $p = 0.422$, indicating a negligible effect size. V3's truth-bias was common (52.5\%) but substantially lower than R1's (74.5\%), rates that were statistically significant: $z = 4.57$, $p < .001$, 95\% CI = [$12.6\%$, $31.4\%$], Cohen’s $h = 0.46$, $\chi^2(1, N = 400) = 20.88$, $p < .001$, indicating a small effect size.
 
 \begin{table}[ht]
 \centering
-\caption{Reasoning vs. Non-Reasoning Models in Study 3 (Base-Rate Prompt)}
+\caption{Base-Rate Prompt (Study 3) Across Model Pairs}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Model} & \textbf{O-Acc.} & \textbf{T-Bias} & \textbf{T-Acc.} & \textbf{D-Acc.} \\
+\textbf{Firm} & \textbf{Model} & \textbf{Capability} & \textbf{Overall Accuracy} & \textbf{Truth-Bias} \\
 \midrule
-\multicolumn{5}{l}{\textbf{Reasoning Models}} \\
-o3 & 67.00\% & 56.50\% & 74.00\% & 60.00\% \\
-o4-mini & 58.50\% & 76.50\% & 85.00\% & 32.00\% \\
-R1 & 56.50\% & 74.50\% & 81.00\% & 32.00\% \\
-Claude 3.7 Sonnet & 63.00\% & 39.00\% & 52.00\% & 74.00\% \\
+\multirow{2}{*}{OpenAI} & o3 & Reasoning & 67.00\% & 56.50\%   \\
+& GPT-4.1 & Non-Reasoning & 62.00\% & 85.00\% \\
 \midrule
-\multicolumn{5}{l}{\textbf{Non-Reasoning Models}} \\
-GPT-4.1 & 62.00\% & 85.00\% & 97.00\% & 27.00\% \\
-V3 & 52.50\% & 52.50\% & 55.00\% & 50.00\% \\
-Claude 3.5 Haiku & 55.50\% & 55.50\% & 61.00\% & 50.00\% \\
-GPT-3.5 Turbo 3.5 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
+\multirow{2}{*}{Anthropic} & 3.7 Sonnet & Reasoning & 63.00\% & 39.00\% \\
+& 3.5 Haiku & Non-Reasoning & 55.50\% & 55.50\% \\
+\midrule
+\multirow{2}{*}{DeepSeek} & R1 & Reasoning & 56.50\% & 74.50\% \\
+& V3 & Non-Reasoning & 52.50\% & 52.50\% \\
 \bottomrule
 \end{tabular}
-\begin{minipage}{0.7\linewidth}
-\vspace{0.05in}
-\footnotesize
-\textit{Note: O-Acc. = Overall Accuracy, T-Bias = Truth-Bias, T-Acc. = Truth Accuracy, D-Acc. = Deception Accuracy.}
-\end{minipage}
-\label{tab:study1_model_comparison}
+\label{tab:study3_model_comparison}
 \end{table}
 
 \section{Discussion}
+\label{sec:discussion}
 
-We have shown that models such as GPT-o4 (reasoning) and GPT-4.1 (non-reasoning) are extremely truth-biased, averaging 88.50\% and 90.83\% across all three prompts respectively for truth-bias rates. While the same models have high truth-accuracy rates of 93\% and 98\%, it is important to note their extremely low deception rates of 15.67\% and 16.33\%. This exceptionally poor performance for deception accuracy and high truth-bias rates suggests that the models are over-indexing on being truthful, which is sycophantic in nature.
+We have shown that models such as o4-mini (reasoning) and GPT-4.1 (non-reasoning) are extremely truth-biased, averaging 88.50\% and 90.83\% across all three prompts respectively for truth-bias rates. We should note here that we choose to compare the strongest-performing reasoning models with the strongest-performing non-reasoning models from the same family---for instance, OpenAI's o3 (reasoning) and OpenAI's GPT-4.1 (non-reasoning)---as it could provide a better baseline comparison. Ultimately, we wish to compare the difference in capabilities, and we believe these comparisons will reduce the chance of confounding factors such as different training data or training methods used by each firm. While the same models have high truth-accuracy rates of 93\% and 98\%, it is important to note their extremely low deception rates of 15.67\% and 16.33\%. This exceptionally poor performance for deception accuracy and high truth-bias rates suggests that the models are over-indexing on being truthful, which is related to sycophancy.
 
-Sycophancy, in which models match their responses to user beliefs instead of being truthful, has been extensively documented in LLMs \citep{chen2025yesmentruthtellersaddressingsycophancy}. A sycophantic model will excessively agree or otherwise flatter the user---this is especially dangerous, for instance, when a user believes they are in a simulation and needs to fend off imagined attackers. Prior research conducted by Sharma et. al \citep{sharma2023understandingsycophancylanguagemodels} found that sycophancy arises when human preference models prefer sycophantic responses over more truthful ones, and generally speaking, agreeableness and certain viewpoints are more represented in training data pulled from online sources \citep{malmqvist2024sycophancylargelanguagemodels}. While a mechanistic approach to explaining truth-bias in AI models remains to be found, we believe that sycophancy is a related behavior to truth-bias---perhaps some causes of truth-bias overlap with those of sycophancy.
+As mentioned above, misaligned models that tend towards truth-bias and sycophancy instead of honesty are dangerous for the general public, as they may encourage inappropriate behaviors or delusions. Model engineers should firstly, be aware of such biases, and secondly, when training the model, engineer prompts by giving the model a hint that there could be some deception. For instance, we found that GPT-o4 was four times more accurate when deception was involved---its deception accuracy rate was 32\% when we used base-rate prompts as opposed to 7\% and 8\% for neutral and veracity prompts. A similar deception accuracy improvement is also previously observed, in which an aggregate of GPT-3.5, Bard LaMDA, and ChatSonic GPT-4 was found to be ten to forty times better at detecting deception when base-rate prompts were used---deception accuracy rates were found to be 44.67\% for base-rate prompts, 4.53\% for veracity prompts, and 1.05\% for neutral prompts \citep{markowitz_generative_2024}. A method of understanding the inner mechanisms that produce cognitive biases within models is ultimately necessary.
 
-As mentioned above, misaligned models that tend towards truth-bias and sycophancy instead of honesty are dangerous for the general public, as they may encourage inappropriate behaviors or delusions. Model engineers should firstly, be aware of such biases, and secondly, when training the model, engineer prompts by giving the model a hint that there could be some deception. For instance, we found that GPT-o4 was four times more accurate when deception was involved---its deception accuracy rate was 32\% when we used base-rate prompts as opposed to 7\% and 8\% for neutral and veracity prompts. A similar deception accuracy improvement is also observed in Markowitz \& Hancock, in which an aggregate of GPT-3.5, Bard LaMDA, and ChatSonic GPT-4 was found to be ten to forty times better at detecting deception when base-rate prompts were used---deception accuracy rates were found to be 44.67\% for base-rate prompts, 4.53\% for veracity prompts, and 1.05\% for neutral prompts \citep{markowitz_generative_2024}.
+\section{Limitations and Future Work}
+\label{sec:limitations}
 
-A method of understanding the inner mechanisms that produce cognitive biases within models is ultimately necessary.
+We note several limitations and opportunities for future work within our study. First, the LLMs evaluated were presumably trained on a vast majority of the internet, which likely included the dataset of statements we use. While the concern of data contamination and foreknowledge is real, we believe the present dataset has been marked down in significance within the LLMs training data, rendering its effect immeasurably low and not a confounding factor. Second, while the present study uses the dataset of hotel reviews, previous work \citep{markowitz_generative_2024} included additional datasets in their evaluation. Because we limit the study to the hotel reviews, our results may be limited to the narrow domain of hotel reviews. However, we believe the cognitive ability necessary for LLMs to evaluate truthful from deceptive statements to be a transferable quality that could be extended to domains outside hotel reviews. Future work should consider using more datasets and comparing the results. Next, while we demonstrate truth-bias in SOTA non-reasoning models and established the existence of a lower truth-bias in SOTA reasoning models, it remains unclear \textit{why} or \textit{how} this occurs. We believe answers to these questions can only be found by going inside the models through mechanistic interpretability. Future work should examine what parameters, attention heads, and XX are (not)activated that cue the truth-bias? Further work could consider how spelling, tone, and grammar sign statements to be truthful or deceptive and how LLMs respond. Additionally, future work could investigate offering different hint sizes to examine whether the model picks up on those cues differently and whether the truth-bias is altered.
 
-\section{Limitations}
+Fourth, because development of LLMs will likely continue to improve, the present results are limited to the current point-in-time. Like previous work which evaluated models that now seen ancient (GPT-3.5), we expect our results to become outdated once new SOTA models are released. Future work should consider new SOTA models and become a repeated evaluation to assess model development. Fifth, our categorization of LLMs into binary categories of non-reasoning and reasoning can be seen as an oversimplification which does not account for firm differences in model development. Finally, while we find a correlation between reasoning enabled models and reduced truth-bias, this does not establish causation. For example, OpenAI's o4-mini performed nearly equal to GPT-3.5---a model nearly two years older and arguably a ``worse'' model. The correlation between the two model classes and their performance on truth-bias will likely remain blurry. Further, we advise users to consider carefully which models to employ for tasks that could be affected by a truth-bias. As such, future work should consider either more nuanced or specific definitions of what is and is not a reasoning model and should consider the relevance of this work given that frontier labs have largely adopted this naming convention.
 
+\textbf{Olivia's Limitation}
 Although this paper has established the existence of truth-bias in reasoning models, whether this human-like trait is the product of similar cognitive processes remains to be unknown until a mechanistic approach of doing so has been discovered. As a result, it is difficult to directly compare human cognitive processes with those of AI models, and it is even harder to explain why truth-bias occurs within reasoning models. Until that point, it is at least significant that generative---and now, reasoning models---are replicating truth-bias.
+
+Our work is ultimately limited by our dataset. We only used hotel reviews whereas Markowitz and Hancock used two additional corpora involving people telling the truth or lying about their feelings towards their friends. The hotel review corpus itself is artificially balanced: 50\% of reviews were truthful, whereas the other 50\% was deceptive. This distribution does not accurately reflect a real-world setting, and as such, our results may not necessarily be completely generalizable to the real world. Additionally, our results may not generalize to other types of deception detection scenarios, such as white lies.
+
+In choosing our models, we acknowledge that we may be oversimplifying models to two broad families of reasoning and non-reasoning, which does not fully capture the nuances and capabilities of each model. The correlation we have established between reasoning capabilities and reduced truth-bias does not establish causation, as a non-reasoning model does not necessarily have to perform worse than a reasoning model. As models continue to quickly evolve, our findings will have limited shelf life, so these findings may only serve as a "point-in-time" finding, and we are unable to account for model updates or improvements.
 
 To be sure, this paper does not aim to explain truth-bias in reasoning models. We look forward to and invite future studies to build upon and explain the nature of truth-bias in AI models.
 
-Add stuff when results have been finalized.
-
-\section{Future Work}
-
-Should consider replicating this evaluation on future models. The LLMs we evaluated were presumably trained on a vast majority of the internet, while presumably included the dataset of statements we use in our evaluation. While the concern of data contamination and the foreknowledge of this data is real, we do not believe this to be the case for several reasons which we assume. (1) the present data set has been marked down for significance within the LLMs training sets and (2) the present data set has only been used three times for academic study and only one other time for evaluating LLMs. Therefore, we conclude that the chances of data contamination are low. Future work should consider examining questions of mechanistic interpretability for why the truth-bias exists within an LLM. What parameters, attention heads, and XX are activated that cue certain aspects of the truth-bias? How much is spelling and accurate grammar signs of truthful or deceptive statements? Further work could also investigate offering different hint sizes (as in study 6) to examine whether the model picks up on those cues differently and whether the truth-bias is altered. 
-
-People often struggle when tasked with detecting deception. Evidence suggests that people are poor deception detectors because most deception cues are faint \citep{depaulo_cues_2003, hartwig_why_2011,luke_lessons_2019}. This phenomenon has been called the \textit{truth-bias}, the idea that people infer a message is honest independent of its veracity \citep{levine_truth-default_2014, mclaughlin_communication_2012}. Simply, humans are more gullible in communication \citep{levine_duped_2020}, demonstrating human nature to default to the truth when judging lies and truths. Recent work has demonstrated the truth-bias in generative artificial intelligence (AI), specifically large language models (LLMs), showing a substantially greater truth-bias than in humans \citep{markowitz_generative_2024}.
-
-The present study builds upon recent work \citep{markowitz_generative_2024} by evaluating reasoning models. Reasoning models are LLMs trained using reinforcement learning (RL) to handle complex reasoning tasks \citep{openai_reasoning_2025}. Unlike base models, they engage in a deliberate thought process before responding, generating an extended chain of reasoning before producing an answer.
-
-Succinctly, this study asks: Base model generative AI has been shown to demonstrate a substantially greater truth-bias than humans, but does this phenomenon extend to reasoning AI models?
-
-\section{Significance Statement}
+\section{Conclusion}
+\label{sec:conclusion}
 
 We have shown that reasoning models exhibit lower truth-bias than base models. We think this may be because of their structured, multi-step reasoning process, which may enhance deception detection by allowing for a more thorough evaluation of contextual cues. Systematic evaluations of AI models are essential for ensuring their reliability in high-stakes applications. Understanding truth-bias in reasoning models provides critical insights into AI safety and robustness, particularly in determining whether these models can be trusted in environments where deception detection is crucial.
 
@@ -331,12 +318,8 @@ Rather than fighting deception and protecting us from misinformation, AI models 
 
 Misinformation and deceit are not necessarily the fault of the Internet and AI, as one must not overlook bad human actors and the lack of stringent regulations. In 2025, the law has simply not caught up to punish, for instance, someone using AI to create a deep-fake video of a politician. The Internet and AI can be tools for accomplishing immoral ends, but that is not to absolve these platforms of responsibility.
 
-Things to consider (from Nick Beas)
-\begin{itemize}
-    \item LLMs can replicate human psychological trends.
-    \item Clear application to AI safety + alignment. But go a step down. MUCH MORE interesting question asks how LLMs mimick human behaviors that are not subjective. They are mimicking psychological tendencies. do these findings hold with previous work on human psychology?
-    \item could be useful to look into the CoT on models that you can. what is happening inside that makes them say what is true and deceptive.
-\end{itemize}
+
+
 
 
 \bibliographystyle{plain} %can also be {abbrvnat}
@@ -357,43 +340,277 @@ Things to consider (from Nick Beas)
 \multicolumn{5}{l}{\textbf{Neutral Prompt (Study 1)}} \\
 \midrule
 \multicolumn{5}{l}{\textit{Reasoning Models}} \\
-OpenAI o3 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-DeepSeek R1 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-Claude 3.7 Sonnet & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
+OpenAI o3 & 67.00\% & 57.50\% & 75.00\% & 59.00\% \\
+OpenAI o4-mini & 51.50\% & 94.00\% & 96.00\% & 7.00\% \\
+DeepSeek R1 & 52.50\% & 92.50\% & 95.00\% & 10.00\% \\
+Claude 3.7 Sonnet & 69.50\% & 66.50\% & 86.00\% & 53.00\% \\
 \midrule
 \multicolumn{5}{l}{\textit{Non-Reasoning Models}} \\
-OpenAI GPT-4.1 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-DeepSeek V3 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-Claude 3.5 Haiku & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
+OpenAI GPT-4.1 & 54.50\% & 94.50\% & 99.00\% & 10.00\% \\
+DeepSeek V3 & 54.00\% & 60.00\% & 64.00\% & 44.00\% \\
+Claude 3.5 Haiku & 62.50\% & 79.50\% & 92.00\% & 33.00\% \\
+OpenAI GPT-3.5 & 51.42\% & 99.36\% & 99.75\% & 1.05\% \\
 \midrule
 \multicolumn{5}{l}{\textbf{Veracity Prompt (Study 2)}} \\
 \midrule
 \multicolumn{5}{l}{\textit{Reasoning Models}} \\
-OpenAI o3 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-DeepSeek R1 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-Claude 3.7 Sonnet & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
+OpenAI o3 & 74.50\% & 49.50\% & 74.00\% & 75.00\% \\
+OpenAI o4-mini & 53.00\% & 95.00\% & 98.00\% & 8.00\% \\
+DeepSeek R1 & 61.00\% & 69.00\% & 80.00\% & 42.00\% \\
+Claude 3.7 Sonnet & 59.50\% & 29.00\% & 39.00\% & 80.00\% \\
 \midrule
 \multicolumn{5}{l}{\textit{Non-Reasoning Models}} \\
-OpenAI GPT-4.1 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-DeepSeek V3 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-Claude 3.5 Haiku & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
+OpenAI GPT-4.1 & 55.00\% & 93.00\% & 98.00\% & 12.00\% \\
+DeepSeek V3 & 50.50\% & 53.50\% & 54.00\% & 47.00\% \\
+Claude 3.5 Haiku & 58.50\% & 65.50\% & 74.00\% & 43.00\% \\
+OpenAI GPT-3.5 & 53.16\% & 97.16\% & 98.75\% & 4.53\% \\
 \midrule
 \multicolumn{5}{l}{\textbf{Base-Rate Prompt (Study 3)}} \\
 \midrule
 \multicolumn{5}{l}{\textit{Reasoning Models}} \\
-OpenAI o3 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-DeepSeek R1 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-Claude 3.7 Sonnet & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
+OpenAI o3 & 67.00\% & 56.50\% & 74.00\% & 60.00\% \\
+OpenAI o4-mini & 58.50\% & 76.50\% & 85.00\% & 32.00\% \\
+DeepSeek R1 & 56.50\% & 74.50\% & 81.00\% & 32.00\% \\
+Claude 3.7 Sonnet & 63.00\% & 39.00\% & 52.00\% & 74.00\% \\
 \midrule
 \multicolumn{5}{l}{\textit{Non-Reasoning Models}} \\
-OpenAI GPT-4.1 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-DeepSeek V3 & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
-Claude 3.5 Haiku & XX.XX\% & XX.XX\% & XX.XX\% & XX.XX\% \\
+OpenAI GPT-4.1 & 62.00\% & 85.00\% & 97.00\% & 27.00\% \\
+DeepSeek V3 & 52.50\% & 52.50\% & 55.00\% & 50.00\% \\
+Claude 3.5 Haiku & 55.50\% & 55.50\% & 61.00\% & 50.00\% \\
+OpenAI GPT-3.5 & 61.33\% & 66.67\% & 78.00\% & 44.67\% \\
 \bottomrule
 \end{tabular}
-\label{tab:model_performance}
+\label{tab:all_models}
 \footnotetext{}
 \parbox[t]{\linewidth}{\footnotesize \textit{Note: Overall accuracy = the number of correctly judged lies and correctly judged truths divided by the total number of messages judged. Truth-bias = the number of messages judged to be truthful divided by the total number of messages judged. Truth accuracy = the number of truths judged correctly divided by the total number of truths in the sample. Deception accuracy = the number of lies judged correctly divided by the total number of lies in the sample.}}
 \end{table}
+
+\newpage
+\section*{NeurIPS Paper Checklist}
+
+\begin{enumerate}
+
+\item {\bf Claims}
+    \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The main claims made in the Abstract and Introduction \ref{sec:introduction} are accurate and are supported throughout the paper, specifically in the sections Methodology \ref{sec:methodology}, Results Across Model Pairs \ref{sec:results_across_model_pairs}, and Discussion \ref{sec:discussion}. 
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the abstract and introduction do not include the claims made in the paper.
+        \item The abstract and/or introduction should clearly state the claims made, including the contributions made in the paper and important assumptions and limitations. A No or NA answer to this question will not be perceived well by the reviewers. 
+        \item The claims made should match theoretical and experimental results, and reflect how much the results can be expected to generalize to other settings. 
+        \item It is fine to include aspirational goals as motivation as long as it is clear that these goals are not attained by the paper. 
+    \end{itemize}
+
+\item {\bf Limitations}
+    \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: In our section Limitations \ref{sec:limitations}, we point out the assumptions about our results and caution against the over-generalization of our findings to domains that are outside our study's scope.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper has no limitation while the answer No means that the paper has limitations, but those are not discussed in the paper. 
+        \item The authors are encouraged to create a separate "Limitations" section in their paper.
+        \item The paper should point out any strong assumptions and how robust the results are to violations of these assumptions (e.g., independence assumptions, noiseless settings, model well-specification, asymptotic approximations only holding locally). The authors should reflect on how these assumptions might be violated in practice and what the implications would be.
+        \item The authors should reflect on the scope of the claims made, e.g., if the approach was only tested on a few datasets or with a few runs. In general, empirical results often depend on implicit assumptions, which should be articulated.
+        \item The authors should reflect on the factors that influence the performance of the approach. For example, a facial recognition algorithm may perform poorly when image resolution is low or images are taken in low lighting. Or a speech-to-text system might not be used reliably to provide closed captions for online lectures because it fails to handle technical jargon.
+        \item The authors should discuss the computational efficiency of the proposed algorithms and how they scale with dataset size.
+        \item If applicable, the authors should discuss possible limitations of their approach to address problems of privacy and fairness.
+        \item While the authors might fear that complete honesty about limitations might be used by reviewers as grounds for rejection, a worse outcome might be that reviewers discover limitations that aren't acknowledged in the paper. The authors should use their best judgment and recognize that individual actions in favor of transparency play an important role in developing norms that preserve the integrity of the community. Reviewers will be specifically instructed to not penalize honesty concerning limitations.
+    \end{itemize}
+
+\item {\bf Theory assumptions and proofs}
+    \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper does not include theoretical results, it includes empirical results.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper does not include theoretical results. 
+        \item All the theorems, formulas, and proofs in the paper should be numbered and cross-referenced.
+        \item All assumptions should be clearly stated or referenced in the statement of any theorems.
+        \item The proofs can either appear in the main paper or the supplemental material, but if they appear in the supplemental material, the authors are encouraged to provide a short proof sketch to provide intuition. 
+        \item Inversely, any informal proof provided in the core of the paper should be complemented by formal proofs provided in appendix or supplemental material.
+        \item Theorems and Lemmas that the proof relies upon should be properly referenced. 
+    \end{itemize}
+
+    \item {\bf Experimental result reproducibility}
+    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: We provide a detailed experimental design for full reproducibility in the Methodology section.  
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper does not include experiments.
+        \item If the paper includes experiments, a No answer to this question will not be perceived well by the reviewers: Making the paper reproducible is important, regardless of whether the code and data are provided or not.
+        \item If the contribution is a dataset and/or model, the authors should describe the steps taken to make their results reproducible or verifiable. 
+        \item Depending on the contribution, reproducibility can be accomplished in various ways. For example, if the contribution is a novel architecture, describing the architecture fully might suffice, or if the contribution is a specific model and empirical evaluation, it may be necessary to either make it possible for others to replicate the model with the same dataset, or provide access to the model. In general. releasing code and data is often one good way to accomplish this, but reproducibility can also be provided via detailed instructions for how to replicate the results, access to a hosted model (e.g., in the case of a large language model), releasing of a model checkpoint, or other means that are appropriate to the research performed.
+        \item While NeurIPS does not require releasing code, the conference does require all submissions to provide some reasonable avenue for reproducibility, which may depend on the nature of the contribution. For example
+        \begin{enumerate}
+            \item If the contribution is primarily a new algorithm, the paper should make it clear how to reproduce that algorithm.
+            \item If the contribution is primarily a new model architecture, the paper should describe the architecture clearly and fully.
+            \item If the contribution is a new model (e.g., a large language model), then there should either be a way to access this model for reproducing the results or a way to reproduce the model (e.g., with an open-source dataset or instructions for how to construct the dataset).
+            \item We recognize that reproducibility may be tricky in some cases, in which case authors are welcome to describe the particular way they provide for reproducibility. In the case of closed-source models, it may be that access to the model is limited in some way (e.g., to registered users), but it should be possible for other researchers to have some path to reproducing or verifying the results.
+        \end{enumerate}
+    \end{itemize}
+
+
+\item {\bf Open access to data and code}
+    \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: \textbf{insert justification here!}
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that paper does not include experiments requiring code.
+        \item Please see the NeurIPS code and data submission guidelines (\url{https://nips.cc/public/guides/CodeSubmissionPolicy}) for more details.
+        \item While we encourage the release of code and data, we understand that this might not be possible, so “No” is an acceptable answer. Papers cannot be rejected simply for not including code, unless this is central to the contribution (e.g., for a new open-source benchmark).
+        \item The instructions should contain the exact command and environment needed to run to reproduce the results. See the NeurIPS code and data submission guidelines (\url{https://nips.cc/public/guides/CodeSubmissionPolicy}) for more details.
+        \item The authors should provide instructions on data access and preparation, including how to access the raw data, preprocessed data, intermediate data, and generated data, etc.
+        \item The authors should provide scripts to reproduce all experimental results for the new proposed method and baselines. If only a subset of experiments are reproducible, they should state which ones are omitted from the script and why.
+        \item At submission time, to preserve anonymity, the authors should release anonymized versions (if applicable).
+        \item Providing as much information as possible in supplemental material (appended to the paper) is recommended, but including URLs to data and code is permitted.
+    \end{itemize}
+
+
+\item {\bf Experimental setting/details}
+    \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer, etc.) necessary to understand the results?
+    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: \justificationTODO{}
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper does not include experiments.
+        \item The experimental setting should be presented in the core of the paper to a level of detail that is necessary to appreciate the results and make sense of them.
+        \item The full details can be provided either with the code, in appendix, or as supplemental material.
+    \end{itemize}
+
+\item {\bf Experiment statistical significance}
+    \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The results include z-score, confidence intervals, p-values, and chi-squared test.  
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper does not include experiments.
+        \item The authors should answer "Yes" if the results are accompanied by error bars, confidence intervals, or statistical significance tests, at least for the experiments that support the main claims of the paper.
+        \item The factors of variability that the error bars are capturing should be clearly stated (for example, train/test split, initialization, random drawing of some parameter, or overall run with given experimental conditions).
+        \item The method for calculating the error bars should be explained (closed form formula, call to a library function, bootstrap, etc.)
+        \item The assumptions made should be given (e.g., Normally distributed errors).
+        \item It should be clear whether the error bar is the standard deviation or the standard error of the mean.
+        \item It is OK to report 1-sigma error bars, but one should state it. The authors should preferably report a 2-sigma error bar than state that they have a 96\% CI, if the hypothesis of Normality of errors is not verified.
+        \item For asymmetric distributions, the authors should be careful not to show in tables or figures symmetric error bars that would yield results that are out of range (e.g. negative error rates).
+        \item If error bars are reported in tables or plots, The authors should explain in the text how they were calculated and reference the corresponding figures or tables in the text.
+    \end{itemize}
+
+\item {\bf Experiments compute resources}
+    \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
+    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: \justificationTODO{}
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper does not include experiments.
+        \item The paper should indicate the type of compute workers CPU or GPU, internal cluster, or cloud provider, including relevant memory and storage.
+        \item The paper should provide the amount of compute required for each of the individual experimental runs as well as estimate the total compute. 
+        \item The paper should disclose whether the full research project required more compute than the experiments reported in the paper (e.g., preliminary or failed experiments that didn't make it into the paper). 
+    \end{itemize}
+    
+\item {\bf Code of ethics}
+    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics \url{https://neurips.cc/public/EthicsGuidelines}?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: Author(s) reviewed the NeurIPS Code of Ethics to ensure our paper is in alignment.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the authors have not reviewed the NeurIPS Code of Ethics.
+        \item If the authors answer No, they should explain the special circumstances that require a deviation from the Code of Ethics.
+        \item The authors should make sure to preserve anonymity (e.g., if there is a special consideration due to laws or regulations in their jurisdiction).
+    \end{itemize}
+
+
+\item {\bf Broader impacts}
+    \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper discusses potential negative societal impacts that can arise when LLMs are used as intended but give truth-bias skewed results.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that there is no societal impact of the work performed.
+        \item If the authors answer NA or No, they should explain why their work has no societal impact or why the paper does not address societal impact.
+        \item Examples of negative societal impacts include potential malicious or unintended uses (e.g., disinformation, generating fake profiles, surveillance), fairness considerations (e.g., deployment of technologies that could make decisions that unfairly impact specific groups), privacy considerations, and security considerations.
+        \item The conference expects that many papers will be foundational research and not tied to particular applications, let alone deployments. However, if there is a direct path to any negative applications, the authors should point it out. For example, it is legitimate to point out that an improvement in the quality of generative models could be used to generate deepfakes for disinformation. On the other hand, it is not needed to point out that a generic algorithm for optimizing neural networks could enable people to train models that generate Deepfakes faster.
+        \item The authors should consider possible harms that could arise when the technology is being used as intended and functioning correctly, harms that could arise when the technology is being used as intended but gives incorrect results, and harms following from (intentional or unintentional) misuse of the technology.
+        \item If there are negative societal impacts, the authors could also discuss possible mitigation strategies (e.g., gated release of models, providing defenses in addition to attacks, mechanisms for monitoring misuse, mechanisms to monitor how a system learns from feedback over time, improving the efficiency and accessibility of ML).
+    \end{itemize}
+    
+\item {\bf Safeguards}
+    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pretrained language models, image generators, or scraped datasets)?
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper poses no such risks.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper poses no such risks.
+        \item Released models that have a high risk for misuse or dual-use should be released with necessary safeguards to allow for controlled use of the model, for example by requiring that users adhere to usage guidelines or restrictions to access the model or implementing safety filters. 
+        \item Datasets that have been scraped from the Internet could pose safety risks. The authors should describe how they avoided releasing unsafe images.
+        \item We recognize that providing effective safeguards is challenging, and many papers do not require this, but we encourage authors to take this into account and make a best faith effort.
+    \end{itemize}
+
+\item {\bf Licenses for existing assets}
+    \item[] Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected?
+    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: Creators of original data sets are properly credited and the license is explicitly mentioned. 
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper does not use existing assets.
+        \item The authors should cite the original paper that produced the code package or dataset.
+        \item The authors should state which version of the asset is used and, if possible, include a URL.
+        \item The name of the license (e.g., CC-BY 4.0) should be included for each asset.
+        \item For scraped data from a particular source (e.g., website), the copyright and terms of service of that source should be provided.
+        \item If assets are released, the license, copyright information, and terms of use in the package should be provided. For popular datasets, \url{paperswithcode.com/datasets} has curated licenses for some datasets. Their licensing guide can help determine the license of a dataset.
+        \item For existing datasets that are re-packaged, both the original license and the license of the derived asset (if it has changed) should be provided.
+        \item If this information is not available online, the authors are encouraged to reach out to the asset's creators.
+    \end{itemize}
+
+\item {\bf New assets}
+    \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper does not release new assets.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper does not release new assets.
+        \item Researchers should communicate the details of the dataset/code/model as part of their submissions via structured templates. This includes details about training, license, limitations, etc. 
+        \item The paper should discuss whether and how consent was obtained from people whose asset is used.
+        \item At submission time, remember to anonymize your assets (if applicable). You can either create an anonymized URL or include an anonymized zip file.
+    \end{itemize}
+
+\item {\bf Crowdsourcing and research with human subjects}
+    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)? 
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper does not involve crowdsourcing nor research with human subjects.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper does not involve crowdsourcing nor research with human subjects.
+        \item Including this information in the supplemental material is fine, but if the main contribution of the paper involves human subjects, then as much detail as possible should be included in the main paper. 
+        \item According to the NeurIPS Code of Ethics, workers involved in data collection, curation, or other labor should be paid at least the minimum wage in the country of the data collector. 
+    \end{itemize}
+
+\item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
+    \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained?
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The paper does not involve crowdsourcing nor research with human subjects.
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the paper does not involve crowdsourcing nor research with human subjects.
+        \item Depending on the country in which research is conducted, IRB approval (or equivalent) may be required for any human subjects research. If you obtained IRB approval, you should clearly state this in the paper. 
+        \item We recognize that the procedures for this may vary significantly between institutions and locations, and we expect authors to adhere to the NeurIPS Code of Ethics and the guidelines for their institution. 
+        \item For initial submissions, do not include any information that would break anonymity (if applicable), such as the institution conducting the review.
+    \end{itemize}
+
+\item {\bf Declaration of LLM usage}
+    \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research? Note that if the LLM is used only for writing, editing, or formatting purposes and does not impact the core methodology, scientific rigorousness, or originality of the research, declaration is not required.
+    %this research? 
+    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+    \item[] Justification: The core method development in this research does not involve LLMs as any important, original, or non-standard components
+    \item[] Guidelines:
+    \begin{itemize}
+        \item The answer NA means that the core method development in this research does not involve LLMs as any important, original, or non-standard components.
+        \item Please refer to our LLM policy (\url{https://neurips.cc/Conferences/2025/LLM}) for what should or should not be described.
+    \end{itemize}
+
+\end{enumerate}
+
+
 
 \end{document}
